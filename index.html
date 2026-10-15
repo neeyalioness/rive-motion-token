@@ -1,0 +1,1078 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CML Rive Motion Tokens</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky tab bar → Mock (stage + control rail) · Transitions (card grid) · Handoff (3 owner columns + matrix) · Doc (toc + reading column) */
+:root{
+  --bg:#F1F2F5; --surface:#FFFFFF; --sunk:#E8EAEF; --ink:#16181D; --muted:#5B6170; --line:#D8DBE2;
+  --accent:#3A55E6; --accent-ink:#FFFFFF;
+  --pro:#3A55E6; --natural:#1F8A63; --playful:#D9488F; --reduced:#6B7280;
+  --own-rive:#7A4BD6; --own-dev:#1F8A63; --own-ds:#B26B00;
+  --code-bg:#14161B; --code-ink:#DDE1EA; --code-dim:#8A93A6; --code-key:#9FB0FF; --code-str:#9BE0B8;
+  --stage-bg:#FFFFFF; --stage-grid:#EEF0F4; --tip-bg:#16181D; --tip-ink:#F1F2F5;
+  --f-display:"Bricolage Grotesque","IBM Plex Sans Thai",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1014; --surface:#171A20; --sunk:#1E222A; --ink:#E7E9EE; --muted:#9AA1AE; --line:#2A2F39;
+  --accent:#8C9DFF; --accent-ink:#0E1014; --pro:#8C9DFF; --natural:#5BCB9C; --playful:#FF86C0; --reduced:#A3A9B6;
+  --own-rive:#B59AFF; --own-dev:#5BCB9C; --own-ds:#F0B45A;
+  --code-bg:#0A0B0E; --stage-bg:#1B1E25; --stage-grid:#22262E; --tip-bg:#E7E9EE; --tip-ink:#0E1014; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1014; --surface:#171A20; --sunk:#1E222A; --ink:#E7E9EE; --muted:#9AA1AE; --line:#2A2F39;
+  --accent:#8C9DFF; --accent-ink:#0E1014; --pro:#8C9DFF; --natural:#5BCB9C; --playful:#FF86C0; --reduced:#A3A9B6;
+  --own-rive:#B59AFF; --own-dev:#5BCB9C; --own-ds:#F0B45A;
+  --code-bg:#0A0B0E; --stage-bg:#1B1E25; --stage-grid:#22262E; --tip-bg:#E7E9EE; --tip-ink:#0E1014; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{overflow-x:clip}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{padding-block:28px 8px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-size:clamp(28px,4vw,40px);line-height:1.1;margin:6px 0 8px;text-wrap:balance}
+.lede{color:var(--muted);max-width:70ch;margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line);margin-top:16px}
+nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto}
+nav.tabs button{font:500 15px var(--f-body);background:none;border:0;color:var(--muted);padding:12px 14px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--accent)}
+button:focus-visible,canvas:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:24px 64px}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+h2.sec{font-family:var(--f-display);font-size:24px;margin:0 0 6px;text-wrap:balance}
+p.sub{margin:0 0 18px;color:var(--muted);max-width:75ch}
+
+/* owner badges */
+.own{display:inline-block;font:500 10.5px var(--f-mono);letter-spacing:.04em;padding:2px 6px;border-radius:4px;white-space:nowrap;vertical-align:middle}
+.own.rive{background:color-mix(in srgb,var(--own-rive) 16%,transparent);color:var(--own-rive)}
+.own.dev{background:color-mix(in srgb,var(--own-dev) 16%,transparent);color:var(--own-dev)}
+.own.ds{background:color-mix(in srgb,var(--own-ds) 18%,transparent);color:var(--own-ds)}
+
+/* tooltip */
+.tip{position:relative;display:inline-flex;align-items:center;flex:none;vertical-align:middle;line-height:0}
+.tip>.tip-btn{box-sizing:border-box;flex:none;width:18px;height:18px;min-width:18px;aspect-ratio:1;margin:0;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:600 10.5px/1 var(--f-mono);cursor:help;display:inline-grid;place-items:center;text-transform:none}
+.tip>.tip-btn:hover,.tip.open>.tip-btn{color:var(--ink);border-color:var(--muted)}
+.tip>.tip-btn[aria-pressed]{background:var(--surface);color:var(--muted)}
+.tip-body{position:absolute;z-index:40;top:calc(100% + 6px);left:0;width:max-content;max-width:min(300px,82vw);background:var(--tip-bg);color:var(--tip-ink);font:400 12.5px/1.55 var(--f-body);padding:9px 11px;border-radius:8px;box-shadow:0 8px 24px rgb(0 0 0/.22);opacity:0;visibility:hidden;transition:opacity .15s;pointer-events:none;text-transform:none;letter-spacing:0;white-space:normal;text-align:left}
+.tip:hover .tip-body,.tip:focus-within .tip-body,.tip.open .tip-body{opacity:1;visibility:visible}
+.tip-body b{font-weight:600}
+
+/* ---------- MOCK ---------- */
+.mock{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:880px){.mock{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.stage{position:relative;overflow:hidden;min-height:380px;display:grid;place-items:center;border-radius:10px 10px 0 0;
+  background:var(--stage-bg);background-image:linear-gradient(var(--stage-grid) 1px,transparent 1px),linear-gradient(90deg,var(--stage-grid) 1px,transparent 1px);background-size:24px 24px;transition:background-color .3s}
+.stage.inverse{--stage-bg:#1C1F27;--stage-grid:#262A33}
+.stage-head{position:absolute;top:12px;left:14px;right:14px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.stage.inverse .stage-head,.stage.inverse .hint{color:#A7AEBB}
+.host{border:1px dashed color-mix(in srgb,var(--muted) 45%,transparent);border-radius:14px;padding:14px;position:relative;background:color-mix(in srgb,var(--stage-bg) 70%,transparent)}
+.host-label{position:absolute;top:-9px;left:10px;font-family:var(--f-mono);font-size:10.5px;background:var(--stage-bg);padding:0 6px;color:var(--own-dev)}
+.rive-box{border:1px solid color-mix(in srgb,var(--own-rive) 55%,transparent);border-radius:10px;position:relative}
+.rive-label{position:absolute;bottom:-9px;right:10px;font-family:var(--f-mono);font-size:10.5px;background:var(--stage-bg);padding:0 6px;color:var(--own-rive)}
+canvas#rive{display:block;width:200px;height:200px;cursor:pointer;touch-action:none}
+.hint{position:absolute;bottom:10px;left:14px;right:14px;font-size:12.5px;color:var(--muted);text-align:center}
+.vm-wrap{border-top:1px solid var(--line);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.vm-wrap h4{margin:0;font:600 13px var(--f-body);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+.rail{display:flex;flex-direction:column;gap:12px}
+.group{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.group h3{margin:0;font:600 14px var(--f-body);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.group h3 .spacer{flex:1}
+.group h3 small{font:400 11.5px var(--f-mono);color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button,.btn{font:500 13px var(--f-body);padding:7px 12px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.seg.schemes button[aria-pressed="true"][data-v="professional"]{background:var(--pro);border-color:var(--pro);color:var(--accent-ink)}
+.seg.schemes button[aria-pressed="true"][data-v="natural"]{background:var(--natural);border-color:var(--natural);color:var(--accent-ink)}
+.seg.schemes button[aria-pressed="true"][data-v="playful"]{background:var(--playful);border-color:var(--playful);color:var(--accent-ink)}
+.seg.schemes button[aria-pressed="true"][data-v="reduced"]{background:var(--reduced);border-color:var(--reduced);color:var(--accent-ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:28px;height:28px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row>label,.row>.lbl{font:400 12.5px var(--f-mono);color:var(--muted);min-width:64px;display:inline-flex;gap:6px;align-items:center}
+select{font:500 13px var(--f-body);padding:6px 10px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.toggle input{accent-color:var(--accent);width:16px;height:16px}
+.st-success{color:#1E9E61}.st-error{color:#D93A3A}.st-info{color:#2F7BE0}.st-warning{color:#C27C05}
+.statepill{font:500 12px var(--f-mono);padding:4px 10px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.statepill.on{background:var(--ink);color:var(--surface)}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);font:12.5px/1.55 var(--f-mono);padding:12px 14px;border-radius:9px;overflow-x:auto;white-space:pre}
+.k{color:var(--code-key)}.s{color:var(--code-str)}.c{color:var(--code-dim)}
+.below{margin-top:20px;display:flex;flex-direction:column;gap:20px}
+.below h3{margin:0 0 8px;font:600 15px var(--f-body);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tscroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:600 11.5px var(--f-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);white-space:nowrap}
+td code{white-space:nowrap}
+.res td:nth-child(4){font-family:var(--f-mono);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.res td:last-child{min-width:240px;color:var(--muted)}
+.res .tier{display:block;font:500 10px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+
+/* ---------- TRANSITIONS ---------- */
+.tbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:22px}
+.tgroup{margin-bottom:30px}
+.tgroup-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:12px}
+.tgroup-head h3{margin:0;font:700 19px var(--f-display)}
+.tgroup-head p{margin:0;color:var(--muted);font-size:13.5px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-width:0}
+.pv{height:130px;position:relative;display:grid;place-items:center;background:var(--sunk);border-radius:10px 10px 0 0;cursor:pointer;overflow:hidden;border:0;width:100%;padding:0}
+.pv-item{position:absolute;width:58px;height:58px;border-radius:14px;display:grid;place-items:center;color:#fff;font:600 18px var(--f-display);background:var(--accent)}
+.pv-item.b{border-radius:50%;background:var(--playful);opacity:0}
+.pv-item svg{width:28px;height:28px}
+.card-body{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.card-top b{font-size:14.5px}
+.card code.tok{font-size:11.5px;color:var(--accent);word-break:break-all;white-space:normal}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.card .meta{font:12px var(--f-mono);color:var(--ink);background:var(--sunk);padding:5px 8px;border-radius:6px;font-variant-numeric:tabular-nums;word-break:break-word}
+.play{font:500 12px var(--f-body);padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+
+/* ---------- HANDOFF ---------- */
+.owners{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:28px}
+@media (max-width:880px){.owners{grid-template-columns:1fr}}
+.ocol{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;border-top:3px solid var(--c)}
+.ocol.rive{--c:var(--own-rive)}.ocol.dev{--c:var(--own-dev)}.ocol.ds{--c:var(--own-ds)}
+.ocol h3{margin:0 0 2px;font:700 18px var(--f-display);color:var(--c)}
+.ocol .when{font-size:13px;color:var(--muted);margin:0 0 10px}
+.ocol h4{margin:14px 0 4px;font:600 12px var(--f-mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ocol ul{margin:0;padding-left:18px;font-size:13.5px}
+.ocol li{margin-bottom:5px}
+.matrix td:not(:first-child),.matrix th:not(:first-child){text-align:center}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--c)}
+.dot.half{background:transparent;box-shadow:inset 0 0 0 2px var(--c)}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:10px 0 28px}
+@media (max-width:880px){.flow{grid-template-columns:1fr}}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px}
+.step b{display:block;font:600 11px var(--f-mono);color:var(--muted);margin-bottom:2px}
+
+/* ---------- DOC ---------- */
+.doc{display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px}
+@media (max-width:880px){.doc{grid-template-columns:1fr}.toc{display:none}}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px);align-self:start;font-size:13px}
+.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid var(--line)}
+.toc a:hover{color:var(--ink);border-color:var(--accent)}
+.doc article{min-width:0}
+.doc section{padding-block:8px 28px;border-bottom:1px solid var(--line)}
+.doc section:last-child{border-bottom:0}
+.doc h2{font-family:var(--f-display);font-size:24px;margin:18px 0 10px;text-wrap:balance}
+.doc h2 .n{font-family:var(--f-mono);font-size:13px;color:var(--muted);margin-right:8px;vertical-align:middle}
+.doc h4{margin:20px 0 6px;font-size:15px}
+.doc p,.doc li{max-width:74ch}
+.doc ul,.doc ol{padding-left:20px}
+.layers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+@media (max-width:700px){.layers{grid-template-columns:1fr}}
+.layer{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.layer b{display:block;font-family:var(--f-mono);font-size:12px;color:var(--accent)}
+.layer span{font-size:13px;color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+@media (max-width:700px){.two{grid-template-columns:1fr}}
+.callout{background:var(--sunk);border-radius:10px;padding:12px 16px;margin:14px 0;font-size:14px}
+.callout strong{display:block;margin-bottom:2px}
+.bad{color:#C2412E}.good{color:#1E9E61}
+.doc table,.handoff table{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.pill{display:inline-block;font:500 11px var(--f-mono);padding:1px 7px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.pill.in{background:color-mix(in srgb,var(--own-rive) 16%,transparent);color:var(--own-rive)}
+.pill.out{background:color-mix(in srgb,var(--own-dev) 18%,transparent);color:var(--own-dev)}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+.case h4{margin:0 0 4px}
+.case .given{font-size:13.5px;color:var(--muted);margin:0 0 10px}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch;margin-bottom:8px}
+.chain .node{background:var(--sunk);border-radius:8px;padding:6px 10px;font:12px var(--f-mono);min-width:0;word-break:break-all}
+.chain .node i{display:block;font:500 10px var(--f-mono);color:var(--muted);font-style:normal;text-transform:uppercase;letter-spacing:.05em}
+.chain .node.val{background:var(--ink);color:var(--surface)}
+.chain .node.val i{color:var(--surface);opacity:.7}
+.chain .ar{align-self:center;color:var(--muted)}
+.case .why{font-size:13.5px;margin:0}
+.src{font-size:13px;color:var(--muted)}
+.src a{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top wrap">
+  <div class="eyebrow">cml design system · motion · rive assets</div>
+  <h1>Motion token สำหรับไฟล์ Rive</h1>
+  <p class="lede">Spinner ตัวอย่างที่แยกการเคลื่อนไหวเป็น 2 ชั้น: <b>inner</b> คือสิ่งที่ไฟล์ .riv ขยับเอง และ <b>outer</b> คือการเคลื่อนไหวของกล่องทั้งก้อน ทั้งสองชั้นอ่านค่าจาก motion scheme เดียวกัน ชี้ที่ปุ่ม <b>i</b> เพื่อดูคำอธิบายของแต่ละส่วน</p>
+  <div class="legend">
+    <span><span class="own rive">Rive</span> designer กำหนดในไฟล์ .riv ก่อนส่ง</span>
+    <span><span class="own dev">Dev</span> handle ใน wrapper / code</span>
+    <span><span class="own ds">DS</span> นิยามใน token และ document</span>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="หน้า">
+  <div class="wrap" role="tablist">
+    <button role="tab" id="t-mock" aria-controls="p-mock" aria-selected="true" data-tab="mock">Mock</button>
+    <button role="tab" id="t-trans" aria-controls="p-trans" aria-selected="false" data-tab="trans">Transitions</button>
+    <button role="tab" id="t-hand" aria-controls="p-hand" aria-selected="false" data-tab="hand">Handoff</button>
+    <button role="tab" id="t-doc" aria-controls="p-doc" aria-selected="false" data-tab="doc">Doc</button>
+  </div>
+</nav>
+
+<main class="wrap">
+<!-- ================= MOCK ================= -->
+<section id="p-mock" role="tabpanel" aria-labelledby="t-mock">
+  <div class="mock">
+    <div class="panel">
+      <div class="stage" id="stage">
+        <div class="stage-head"><span id="sh-scheme">motionScheme: professional</span><span id="sh-state">state: idle · status: none</span></div>
+        <div class="host" id="host">
+          <span class="host-label">host container · outer · Dev</span>
+          <div class="rive-box">
+            <canvas id="rive" tabindex="0" aria-label="Spinner ตัวอย่าง ชี้เพื่อ hover กดค้างเพื่อ pressed" role="img"></canvas>
+            <span class="rive-label">spinner.riv · inner · Rive</span>
+          </div>
+        </div>
+        <div class="hint">ชี้เมาส์ = hover (หัวใจชมพู) · กดค้าง = pressed (ดาวเหลือง) · คีย์บอร์ด: Tab แล้วกด Space ค้าง</div>
+      </div>
+      <div class="vm-wrap">
+        <h4>View model ใน .riv ตอนนี้ <span data-tip="สิ่งที่ wrapper เขียนลง View model <b>VM_Spinner</b> ในไฟล์ .riv ณ ตอนนี้ เหมือนเปิดดูใน Rive DevTools<br><br>ชื่อและชนิดของ property ทั้งหมด designer เป็นคนสร้างในไฟล์ ส่วนค่า dev เป็นคนเขียน"></span> <span class="own rive">Rive สร้าง</span> <span class="own dev">Dev เขียนค่า</span></h4>
+        <pre class="code" id="vm-out"></pre>
+      </div>
+    </div>
+
+    <div class="rail">
+      <div class="panel group">
+        <h3>Motion scheme <span data-tip="บุคลิกการเคลื่อนไหวของทั้งระบบ เป็น <b>mode</b> ของ token (แบบเดียวกับ light/dark ของสี) ไม่ใช่ส่วนหนึ่งของชื่อ token<br><br>ส่งครั้งเดียว ทั้งไฟล์ Rive (inner) และกล่อง (outer) จะอ่านค่าตามนี้<br><br><b>reduced</b> ใช้อัตโนมัติเมื่อผู้ใช้ตั้งลดการเคลื่อนไหวใน OS"></span><span class="spacer"></span><span class="own ds">DS</span><span class="own dev">Dev</span></h3>
+        <div class="seg schemes" data-sync="scheme">
+          <button data-v="professional" aria-pressed="true">Professional</button>
+          <button data-v="natural" aria-pressed="false">Natural</button>
+          <button data-v="playful" aria-pressed="false">Playful</button>
+          <button data-v="reduced" aria-pressed="false">Reduced</button>
+        </div>
+        <p class="scheme-desc" style="margin:0;font-size:13px;color:var(--muted)"></p>
+      </div>
+
+      <div class="panel group">
+        <h3>Interaction state <span data-tip="สถานะที่เกิดจากผู้ใช้ทำกับ component <b>Dev คำนวณเอง</b> จาก pointer, keyboard focus และ disabled ตามลำดับความสำคัญ แล้วเขียนลง property <code>state</code><br><br>คนเรียกใช้ไม่ต้องส่ง ยกเว้น disabled<br><br>Designer ต้องทำ animation ให้ครบทุกค่าของ enum นี้ในไฟล์"></span><span class="spacer"></span><span class="own dev">Dev คำนวณ</span><span class="own rive">Rive วาด</span></h3>
+        <div class="seg" id="state-pills" aria-live="polite">
+          <span class="statepill" data-v="idle">idle</span><span class="statepill" data-v="hover">hover</span><span class="statepill" data-v="focused">focused</span><span class="statepill" data-v="pressed">pressed</span><span class="statepill" data-v="disabled">disabled</span>
+        </div>
+        <label class="toggle"><input type="checkbox" id="cb-disabled"> disabled (prop จากคนเรียกใช้)</label>
+      </div>
+
+      <div class="panel group">
+        <h3>Status <span data-tip="ผลลัพธ์ของงานที่ spinner กำลังรอ (เดิมเรียก <b>feedback</b>) แยกเป็น enum ของตัวเองเพราะซ้อนกับ interaction ได้ เช่น error อยู่แล้วผู้ใช้ hover<br><br>ลำดับ: disabled &gt; status &gt; pressed &gt; hover/focused &gt; idle<br><br>Designer ทำ animation ของแต่ละค่า, DS กำหนดสีจาก <code>cml.sys.color.status.*</code>"></span><span class="spacer"></span><span class="own rive">Rive</span><span class="own ds">DS สี</span></h3>
+        <div class="seg" data-seg="status">
+          <button data-v="none" aria-pressed="true">none</button>
+          <button data-v="success" aria-pressed="false" class="st-success">success</button>
+          <button data-v="error" aria-pressed="false" class="st-error">error</button>
+          <button data-v="warning" aria-pressed="false" class="st-warning">warning</button>
+          <button data-v="info" aria-pressed="false" class="st-info">info</button>
+        </div>
+      </div>
+
+      <div class="panel group">
+        <h3>Surface <span data-tip="พื้นหลังที่ component วางอยู่ (เดิมเรียก <b>emphasis / inverse</b>)<br><br><b>inverse</b> = วางบนพื้นเข้ม ส่วนใหญ่แค่สลับชุดสี จึงควรมาจาก color token ไม่ใช่ animation ใหม่ Designer แค่ bind สีให้อ่านจาก property ไม่ต้องทำ timeline เพิ่ม"></span><span class="spacer"></span><span class="own ds">DS สี</span><span class="own dev">Dev</span></h3>
+        <div class="seg" data-seg="surface">
+          <button data-v="default" aria-pressed="true">default</button>
+          <button data-v="inverse" aria-pressed="false">inverse</button>
+        </div>
+      </div>
+
+      <div class="panel group">
+        <h3>Appearance props <span data-tip="property ใน View model ที่ designer เปิดไว้ให้ปรับจากภายนอก Dev resolve token เป็นค่าจริงแล้วเขียนลงไป ไฟล์ .riv ผูก (bind) property เข้ากับ shape เอง<br><br>เปลี่ยนค่าเหล่านี้แล้ว <b>state ไม่เปลี่ยน</b> แค่หน้าตาเปลี่ยน"></span><span class="spacer"></span><span class="own rive">Rive bind</span><span class="own dev">Dev ส่งค่า</span></h3>
+        <div class="row"><span class="lbl">color <span data-tip="สีตอน idle มาจาก <code>cml.sys.color.*</code> สี hover / pressed / status เป็น token ของตัวเองแยกต่างหาก"></span></span><div class="swatches" id="sw"></div></div>
+        <div class="row"><span class="lbl">size <span data-tip="ขนาดของ artboard ใน layout (px) Designer ต้องตั้ง artboard ให้ scale ได้ (Fit: contain, จุดกึ่งกลางตรงกลาง)"></span></span><div class="seg" data-seg="size"></div></div>
+        <div class="row"><span class="lbl">stroke <span data-tip="ความหนาเส้น Designer ต้อง bind ค่า stroke ของ shape เข้ากับ property <code>stroke</code> ไม่ใช่ใส่ค่าตายตัว"></span></span><div class="seg" data-seg="stroke"></div></div>
+      </div>
+
+      <div class="panel group">
+        <h3>Container transition <span data-tip="การเคลื่อนไหวของ <b>กล่องที่ห่อ Rive ทั้งก้อน</b> ทำใน code ด้วย token ไม่ได้อยู่ในไฟล์ .riv ใช้ร่วมกับ component อื่นได้<br><br>ดูตัวอย่างครบทุกแบบที่แท็บ Transitions"></span><span class="spacer"></span><span class="own dev">Dev</span><span class="own ds">DS</span></h3>
+        <div class="row"><label for="sel-enter">enter</label><select id="sel-enter"></select></div>
+        <div class="row"><label for="sel-exit">exit</label><select id="sel-exit"></select></div>
+        <div class="seg">
+          <button class="btn primary" id="b-enter">Play enter</button>
+          <button class="btn" id="b-exit">Play exit</button>
+          <button class="btn" id="b-swap">Exit → Enter</button>
+          <button class="btn" id="b-emph">Emphasis</button>
+        </div>
+        <div class="row" style="font-size:12.5px;color:var(--muted)">Emphasis เลือกแบบจาก status ให้อัตโนมัติ <span data-tip="Emphasis ดึงความสนใจโดยไม่เปลี่ยน state Wrapper เลือกแบบจาก status ให้อัตโนมัติ: error → shake, success → bounce, warning → wiggle, อื่น ๆ → pulse"></span></div>
+        <pre class="code" id="css-out" aria-live="polite"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="below">
+    <div>
+      <h3>สิ่งที่คนเรียกใช้ส่งเข้ามา <span data-tip="คนเรียกใช้ (product dev) ส่งแค่ชื่อ token หรือค่า enum Wrapper เป็นคน resolve ค่าจริง แปลงเป็น View model และ animate กล่อง"></span></h3>
+      <pre class="code" id="api-out"></pre>
+    </div>
+    <div>
+      <h3>Token resolution <span data-tip="อ่านจากซ้ายไปขวา<br><b>Component</b> บอกว่าใช้ที่ส่วนไหนของ spinner<br><b>Semantic</b> บอกหน้าที่ และเปลี่ยนค่าตาม scheme<br><b>Primitive</b> คือค่าดิบที่ถูกเลือก<br><br>คอลัมน์สุดท้ายคือเหตุผลที่ต้องเขียนไว้ใน document"></span></h3>
+      <div class="panel tscroll">
+        <table class="res"><thead><tr><th>Component</th><th>Semantic (sys)</th><th>Primitive (ref)</th><th>Value</th><th>เจ้าของ</th><th>ทำไมต้องเป็นค่านี้</th></tr></thead><tbody id="res"></tbody></table>
+      </div>
+      <p class="src" style="margin-top:8px">ค่าในตารางเปลี่ยนตาม scheme, state, status และ surface ที่เลือกด้านบน ดูเคสแยกพร้อมคำอธิบายเต็มที่ Doc ข้อ 3</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRANSITIONS ================= -->
+<section id="p-trans" role="tabpanel" aria-labelledby="t-trans" hidden>
+  <h2 class="sec">Transition catalog</h2>
+  <p class="sub">ตัวอย่าง transition ของกล่อง (outer) แยกตามบทบาท ทุกตัวเป็น semantic token รูปแบบ <code>cml.sys.motion.transition.{role}.{pattern}</code> ค่า duration, easing และระยะจะเปลี่ยนตาม scheme ที่เลือก กดที่กล่องเพื่อเล่น</p>
+  <div class="tbar">
+    <div class="seg schemes" data-sync="scheme">
+      <button data-v="professional" aria-pressed="true">Professional</button>
+      <button data-v="natural" aria-pressed="false">Natural</button>
+      <button data-v="playful" aria-pressed="false">Playful</button>
+      <button data-v="reduced" aria-pressed="false">Reduced</button>
+    </div>
+    <button class="btn primary" id="b-playall">เล่นทั้งหมด</button>
+    <span class="scheme-desc" style="font-size:13px;color:var(--muted)"></span>
+  </div>
+  <div id="catalog"></div>
+  <p class="src">Pattern ชุด change อิงจาก M3 transition patterns (fade, fade through, shared axis) · ค่า easing อิง M3 easing and duration · spring อิงชุด M3 Expressive</p>
+</section>
+
+<!-- ================= HANDOFF ================= -->
+<section id="p-hand" role="tabpanel" aria-labelledby="t-hand" hidden class="handoff">
+  <h2 class="sec">ใครทำอะไร</h2>
+  <p class="sub">แยกตามว่าต้อง “อยู่ในไฟล์ .riv ก่อนส่ง”, “ต้องเขียนใน code” หรือ “ต้องมีเป็น document และที่มา” ถ้าของชิ้นไหนไม่มีเจ้าของชัด มักจะหายไประหว่าง handoff</p>
+
+  <h3 style="margin:0 0 4px;font:600 15px var(--f-body)">ลำดับการทำงาน</h3>
+  <div class="flow">
+    <div class="step"><b>1 · DS</b>ออก token + contract (View model schema) + template .riv</div>
+    <div class="step"><b>2 · Rive</b>ทำ animation ทุก state × scheme ตาม contract แล้ว export</div>
+    <div class="step"><b>3 · DS</b>review ไฟล์กับ checklist และ state matrix</div>
+    <div class="step"><b>4 · Dev</b>เสียบไฟล์ใน wrapper, resolve token, ทำ outer transition</div>
+    <div class="step"><b>5 · ทุกฝ่าย</b>QA บนเว็บจริง ทั้ง 4 scheme และ keyboard</div>
+  </div>
+
+  <div class="owners">
+    <div class="ocol rive">
+      <h3>Rive designer</h3>
+      <p class="when">ต้องอยู่ในไฟล์ .riv <b>ก่อนส่งไฟล์มา</b> เพราะ code สร้างหรือแก้ส่วนนี้ไม่ได้</p>
+      <h4>โครงไฟล์</h4>
+      <ul>
+        <li>Artboard ชื่อ <code>Spinner</code> จุดกึ่งกลางอยู่ตรงกลาง ไม่มีขอบว่างเกิน</li>
+        <li>State machine ตัวเดียวชื่อ <code>SM_Main</code></li>
+        <li>View model <code>VM_Spinner</code> ตาม contract: ชื่อ, ชนิด, ค่า enum ต้องตรงทุกตัว</li>
+      </ul>
+      <h4>Animation</h4>
+      <ul>
+        <li>ทุกค่าของ <code>state</code> × <code>status</code> × <code>scheme</code> มี animation</li>
+        <li>เงื่อนไข transition ใน state machine อ่านจาก property ใน View model</li>
+        <li>Duration / easing / spring ใน timeline ใช้ค่าตาม token spec (inner)</li>
+        <li>ค่าที่ไม่รู้จักให้กลับไป idle (fallback)</li>
+      </ul>
+      <h4>Binding</h4>
+      <ul>
+        <li>Bind สี, ขนาด, ความหนาเส้นเข้ากับ property ไม่ใส่ค่าตายตัว</li>
+        <li>Surface inverse ใช้แค่ binding สี ไม่ทำ timeline ใหม่</li>
+      </ul>
+      <h4>ส่งกลับให้ dev รู้</h4>
+      <ul>
+        <li>Rive Event <code>exitDone</code> เมื่อ animation ออกเล่นจบ</li>
+        <li>ไม่ใส่ listener hover/pressed ในไฟล์ (dev คุมเอง)</li>
+      </ul>
+      <h4>ของที่ส่งมอบ</h4>
+      <ul><li>.riv + วิดีโอ preview ทุก state + เลขเวอร์ชัน contract</li></ul>
+    </div>
+
+    <div class="ocol dev">
+      <h3>Developer</h3>
+      <p class="when">สิ่งที่ <b>ต้องเขียนใน code</b> ครั้งเดียวใน wrapper <code>CmlRive</code> แล้วใช้ได้กับทุกไฟล์</p>
+      <h4>Token</h4>
+      <ul>
+        <li>Resolver: ชื่อ token → ค่าจริง ตาม mode (scheme)</li>
+        <li>เลือก mode <code>reduced</code> เองเมื่อ <code>prefers-reduced-motion</code></li>
+        <li>แปลง spring → <code>linear()</code> ตอน build สำหรับเว็บ</li>
+      </ul>
+      <h4>State</h4>
+      <ul>
+        <li>ฟัง pointer, focus, keyboard แล้วคำนวณ <code>state</code> ตามลำดับความสำคัญ</li>
+        <li>เขียน <code>state</code>, <code>status</code>, <code>surface</code>, <code>scheme</code>, สี, ขนาด, เส้น ลง View model</li>
+        <li>แปลงสี hex เป็นค่าที่ Rive รับ</li>
+      </ul>
+      <h4>Outer</h4>
+      <ul>
+        <li>Enter / exit / change / emphasis ของกล่องด้วย token</li>
+        <li>Lifecycle: ยิง <code>exit</code> → รอ <code>exitDone</code> → เล่น outer exit → unmount</li>
+      </ul>
+      <h4>คุณภาพ</h4>
+      <ul>
+        <li><code>role="status"</code>, live region ตอน status เปลี่ยน, focus ring</li>
+        <li>Fallback เป็นรูปนิ่งเมื่อโหลด .riv ไม่ได้</li>
+        <li>ตรวจเลขเวอร์ชัน contract และ cleanup ตอน unmount</li>
+      </ul>
+    </div>
+
+    <div class="ocol ds">
+      <h3>Design system · Docs</h3>
+      <p class="when">สิ่งที่ <b>ต้องเป็น document และที่มา</b> เพื่อให้สองฝั่งตัดสินใจตรงกันโดยไม่ต้องถามกัน</p>
+      <h4>Token</h4>
+      <ul>
+        <li>นิยาม ref / sys / comp ใน Figma Variables + JSON (มี 4 modes)</li>
+        <li>ทุก sys token มีคำอธิบาย, ใช้เมื่อไร, ห้ามใช้เมื่อไร, ที่มา</li>
+      </ul>
+      <h4>Contract</h4>
+      <ul>
+        <li>View model schema (ชื่อ, ชนิด, ค่า enum, ค่าเริ่มต้น)</li>
+        <li>Template .riv ที่ตั้งโครงไว้แล้ว</li>
+        <li>ลำดับความสำคัญของ state</li>
+      </ul>
+      <h4>Spec ต่อ component</h4>
+      <ul>
+        <li>State matrix: state × status × scheme ว่าแต่ละช่องหน้าตาอย่างไร</li>
+        <li>Transition ที่อนุญาตให้ใช้กับ component นี้</li>
+      </ul>
+      <h4>การดูแล</h4>
+      <ul>
+        <li>Naming convention, changelog, เวอร์ชัน, นโยบาย deprecate</li>
+        <li>Checklist สำหรับ review ไฟล์ .riv</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin:0 0 8px;font:600 15px var(--f-body)">Matrix: แต่ละเรื่องใครรับผิดชอบ</h3>
+  <div class="tscroll">
+  <table class="matrix">
+    <thead><tr><th>เรื่อง</th><th><span class="own rive">Rive</span></th><th><span class="own dev">Dev</span></th><th><span class="own ds">DS</span></th><th style="text-align:left">หมายเหตุ</th></tr></thead>
+    <tbody>
+      <tr><td>หน้าตาและ animation ของแต่ละ state</td><td><span class="dot" style="--c:var(--own-rive)"></span></td><td></td><td><span class="dot half" style="--c:var(--own-ds)"></span></td><td>DS ให้ state matrix, Rive ทำจริง</td></tr>
+      <tr><td>Duration / easing ภายใน timeline</td><td><span class="dot" style="--c:var(--own-rive)"></span></td><td></td><td><span class="dot half" style="--c:var(--own-ds)"></span></td><td>ค่าถูก bake ในไฟล์ ใช้ token เป็น spec</td></tr>
+      <tr><td>ชื่อและชนิด property ใน View model</td><td><span class="dot" style="--c:var(--own-rive)"></span></td><td></td><td><span class="dot" style="--c:var(--own-ds)"></span></td><td>DS เขียน contract, Rive สร้างตาม</td></tr>
+      <tr><td>ตรวจจับ hover / pressed / focus</td><td></td><td><span class="dot" style="--c:var(--own-dev)"></span></td><td></td><td>ไม่ใช้ listener ใน .riv</td></tr>
+      <tr><td>ลำดับความสำคัญของ state</td><td></td><td><span class="dot" style="--c:var(--own-dev)"></span></td><td><span class="dot" style="--c:var(--own-ds)"></span></td><td>DS กำหนด, Dev implement</td></tr>
+      <tr><td>ค่าสี / ขนาด / เส้น</td><td><span class="dot half" style="--c:var(--own-rive)"></span></td><td><span class="dot" style="--c:var(--own-dev)"></span></td><td><span class="dot" style="--c:var(--own-ds)"></span></td><td>Rive bind, Dev ส่งค่า, DS นิยาม token</td></tr>
+      <tr><td>Enter / exit / emphasis ของกล่อง</td><td></td><td><span class="dot" style="--c:var(--own-dev)"></span></td><td><span class="dot" style="--c:var(--own-ds)"></span></td><td>ไม่อยู่ใน .riv</td></tr>
+      <tr><td>Reduced motion</td><td><span class="dot half" style="--c:var(--own-rive)"></span></td><td><span class="dot" style="--c:var(--own-dev)"></span></td><td><span class="dot" style="--c:var(--own-ds)"></span></td><td>Rive ทำ layer reduced, Dev สลับ mode</td></tr>
+      <tr><td>เหตุผลและที่มาของค่า token</td><td></td><td></td><td><span class="dot" style="--c:var(--own-ds)"></span></td><td>อ้างอิง M3 และการทดสอบของทีม</td></tr>
+      <tr><td>Accessibility (role, live region)</td><td></td><td><span class="dot" style="--c:var(--own-dev)"></span></td><td><span class="dot half" style="--c:var(--own-ds)"></span></td><td>DS เขียนข้อความที่ต้องประกาศ</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="src" style="margin-top:8px">● รับผิดชอบหลัก · ○ มีส่วนร่วม</p>
+</section>
+
+<!-- ================= DOC ================= -->
+<section id="p-doc" role="tabpanel" aria-labelledby="t-doc" hidden>
+<div class="doc">
+<nav class="toc" aria-label="สารบัญ">
+  <a href="#d-model">1 · แยกสองชั้น</a>
+  <a href="#d-tiers">2 · แต่ละชั้นต้องมีอะไร</a>
+  <a href="#d-cases">3 · Token resolution ทีละเคส</a>
+  <a href="#d-scheme">4 · Scheme เป็น mode</a>
+  <a href="#d-naming">5 · Naming</a>
+  <a href="#d-review">6 · รีวิว token ปัจจุบัน</a>
+  <a href="#d-cat">7 · Category</a>
+  <a href="#d-values">8 · ค่าของแต่ละ scheme</a>
+  <a href="#d-states">9 · State, status, surface</a>
+  <a href="#d-rive">10 · Contract ของไฟล์ Rive</a>
+  <a href="#d-api">11 · Component API</a>
+  <a href="#d-json">12 · รูปแบบไฟล์ token</a>
+  <a href="#d-a11y">13 · Reduced motion</a>
+  <a href="#d-todo">14 · ควรเพิ่มอะไร</a>
+</nav>
+<article>
+
+<section id="d-model">
+<h2><span class="n">01</span>แยกสองชั้น: Inner กับ Outer</h2>
+<div class="two">
+  <div class="layer"><b style="color:var(--own-rive)">Inner · อยู่ในไฟล์ .riv</b><span>หมุน, morph วงกลม → หัวใจ → ดาว, สีของแต่ละ state Designer ทำใน Rive Editor ฝั่ง code คุมได้ผ่าน <b style="display:inline;color:inherit">View model</b> (data binding) เท่านั้น</span></div>
+  <div class="layer"><b style="color:var(--own-dev)">Outer · อยู่ใน code</b><span>การเคลื่อนไหวของกล่องที่ห่อ Rive: enter, exit, change, emphasis ทำด้วย CSS / Compose / SwiftUI และใช้ token ได้ตรง ๆ</span></div>
+</div>
+<div class="callout"><strong>State machine inputs ถูก deprecate แล้ว</strong>เอกสารของ Rive แนะนำให้ใช้ Data Binding (View model) แทน inputs ทั้ง state และ props จึงอยู่ใน View model ตัวเดียว</div>
+</section>
+
+<section id="d-tiers">
+<h2><span class="n">02</span>แต่ละชั้นของ token ต้องมีค่าอะไร</h2>
+<p>เปรียบให้เห็นภาพ: <b>ref</b> คือกล่องสีที่มีทุกเฉด, <b>sys</b> คือกฎว่า “ปุ่มหลักใช้สีไหน”, <b>comp</b> คือการระบุว่า “ขอบของ spinner ทำตามกฎปุ่มหลัก” ถ้าเปลี่ยนกฎ (scheme) ทุก component ที่อ้างกฎนั้นเปลี่ยนตามทันที</p>
+<div class="tscroll"><table>
+<thead><tr><th>Field</th><th>ref · primitive</th><th>sys · semantic</th><th>comp · component</th></tr></thead>
+<tbody>
+<tr><td><b>ชื่อ</b></td><td>ตามค่า<br><code>cml.ref.motion.duration.250</code></td><td>ตามหน้าที่<br><code>cml.sys.motion.transition.enter.scale</code></td><td>ตามชิ้นส่วน<br><code>cml.comp.spinner.container.enter</code></td></tr>
+<tr><td><b>ชนิด ($type)</b></td><td>duration, cubicBezier, spring, number, color</td><td>เหมือน ref หรือ composite (transition)</td><td>เหมือน sys ที่อ้าง</td></tr>
+<tr><td><b>ค่า</b></td><td>ค่าจริง + หน่วย (<code>250ms</code>)</td><td>alias ไปหา ref <b>แยกตาม mode</b> (professional / natural / playful / reduced)</td><td>alias ไปหา sys <b>ตัวเดียว</b> ไม่แยก mode</td></tr>
+<tr><td><b>คำอธิบาย</b></td><td>สั้น ๆ ว่าคืออะไร</td><td>หน้าที่, ใช้เมื่อไร, ห้ามใช้เมื่อไร</td><td>ใช้ที่ส่วนไหนของ component</td></tr>
+<tr><td><b>ที่มา / เหตุผล</b></td><td>ไม่จำเป็น</td><td><b>จำเป็น</b>: ลิงก์ M3 หรือผลทดสอบของทีม</td><td>เฉพาะเมื่อ component ใช้ค่าต่างจากปกติ</td></tr>
+<tr><td><b>Override ได้ไหม</b></td><td>–</td><td>ผ่าน scheme เท่านั้น</td><td>ระบุว่าคนเรียกใช้ส่งค่าอื่นได้หรือไม่</td></tr>
+<tr><td><b>เจ้าของ</b></td><td>DS</td><td>DS</td><td>DS + เจ้าของ component</td></tr>
+</tbody></table></div>
+<div class="callout"><strong>กฎสำคัญ</strong>comp ต้องอ้าง sys เสมอ ห้ามอ้าง ref ตรง ๆ เพราะ ref ไม่มี mode ถ้าข้าม sys การสลับ scheme จะไม่มีผลกับ component นั้น</div>
+</section>
+
+<section id="d-cases">
+<h2><span class="n">03</span>Token resolution ทีละเคส</h2>
+<p>ทุกเคสใช้ spinner ตัวเดียวกัน ดูว่าชื่อ token ไหนคงเดิมและค่าไหนเปลี่ยน</p>
+
+<div class="case">
+  <h4>เคส 1 · ค่าเริ่มต้น</h4>
+  <p class="given">หน้าเว็บตั้ง scheme = professional · spinner ไม่ได้ส่ง prop อะไรเพิ่ม · เล่น enter</p>
+  <div class="chain"><span class="node"><i>comp</i>cml.comp.spinner.container.enter</span><span class="ar">→</span><span class="node"><i>sys · mode professional</i>cml.sys.motion.transition.enter.scale</span><span class="ar">→</span><span class="node"><i>ref</i>duration.250 + easing.standard-decelerate</span><span class="ar">→</span><span class="node val"><i>value</i>250ms · cubic-bezier(0,0,0,1)</span></div>
+  <p class="why"><b>ทำไม:</b> ของที่เข้ามาใหม่ใช้ decelerate (เร็วตอนเริ่ม ชะลอตอนถึง) ให้ตาจับตำแหน่งสุดท้ายได้ professional ใช้ชุด standard ที่ไม่มี overshoot</p>
+</div>
+
+<div class="case">
+  <h4>เคส 2 · Override scheme ที่ตัว component</h4>
+  <p class="given">หน้าเว็บเป็น professional แต่ spinner ตัวนี้ส่ง <code>motionScheme="playful"</code></p>
+  <div class="chain"><span class="node"><i>comp</i>cml.comp.spinner.container.enter</span><span class="ar">→</span><span class="node"><i>sys · mode playful</i>cml.sys.motion.transition.enter.scale</span><span class="ar">→</span><span class="node"><i>ref</i>spring.expressive-spatial-fast</span><span class="ar">→</span><span class="node val"><i>value</i>stiffness 800 · damping 0.6</span></div>
+  <p class="why"><b>ทำไม:</b> ชื่อ comp และ sys <b>ไม่เปลี่ยนเลย</b> สิ่งที่เปลี่ยนคือ mode ที่ sys ใช้เลือก ref นี่คือเหตุผลที่ไม่ใส่ชื่อธีมในชื่อ token</p>
+</div>
+
+<div class="case">
+  <h4>เคส 3 · ผู้ใช้ตั้งลดการเคลื่อนไหวใน OS</h4>
+  <p class="given"><code>prefers-reduced-motion: reduce</code> · wrapper เปลี่ยน mode เป็น reduced เอง</p>
+  <div class="chain"><span class="node"><i>comp</i>cml.comp.spinner.container.enter</span><span class="ar">→</span><span class="node"><i>sys · mode reduced</i>cml.sys.motion.transition.enter.scale</span><span class="ar">→</span><span class="node"><i>ref</i>duration.150 + easing.linear + scale.100</span><span class="ar">→</span><span class="node val"><i>value</i>150ms · fade อย่างเดียว</span></div>
+  <p class="why"><b>ทำไม:</b> ยังมี feedback ว่าของปรากฏขึ้น แต่ไม่มีการขยับตำแหน่งหรือขนาด ซึ่งเป็นสิ่งที่ทำให้ผู้ใช้บางกลุ่มเวียนหัว คนเรียกใช้ไม่ต้องเขียนอะไรเพิ่ม</p>
+</div>
+
+<div class="case">
+  <h4>เคส 4 · Status error + emphasis</h4>
+  <p class="given">งานล้มเหลว · wrapper ตั้ง <code>status = error</code> แล้วเล่น emphasis ให้อัตโนมัติ</p>
+  <div class="chain"><span class="node"><i>comp</i>cml.comp.spinner.rive.status.error.color</span><span class="ar">→</span><span class="node"><i>sys</i>cml.sys.color.status.error</span><span class="ar">→</span><span class="node"><i>ref</i>cml.ref.palette.red.50</span><span class="ar">→</span><span class="node val"><i>value</i>#D93A3A</span></div>
+  <div class="chain"><span class="node"><i>comp</i>cml.comp.spinner.container.emphasis.error</span><span class="ar">→</span><span class="node"><i>sys</i>cml.sys.motion.transition.emphasis.shake</span><span class="ar">→</span><span class="node"><i>ref</i>duration.300 + offset.4</span><span class="ar">→</span><span class="node val"><i>value</i>300ms · ±4px (professional)</span></div>
+  <p class="why"><b>ทำไม:</b> สีบอกความหมาย แต่สีอย่างเดียวไม่พอสำหรับคนตาบอดสี จึงมี glyph ✕ ใน .riv และการสั่นที่กล่องช่วยดึงสายตา shake ใช้กับ error เท่านั้นเพื่อไม่ให้ความหมายเจือจาง</p>
+</div>
+
+<div class="case">
+  <h4>เคส 5 · วางบนพื้นเข้ม (surface inverse)</h4>
+  <p class="given">spinner อยู่ใน banner สีเข้ม · ส่ง <code>surface="inverse"</code></p>
+  <div class="chain"><span class="node"><i>comp</i>cml.comp.spinner.rive.color</span><span class="ar">→</span><span class="node"><i>sys · surface inverse</i>cml.sys.color.inverse-primary</span><span class="ar">→</span><span class="node"><i>ref</i>cml.ref.palette.cobalt.80</span><span class="ar">→</span><span class="node val"><i>value</i>#9DAAF3</span></div>
+  <p class="why"><b>ทำไม:</b> สี primary ปกติมี contrast ต่ำบนพื้นเข้ม inverse เป็นเรื่องของสี ไม่ใช่ motion ไฟล์ .riv จึงไม่ต้องมี animation ชุดใหม่ แค่ bind สีจาก property</p>
+</div>
+
+<div class="case">
+  <h4>เคส 6 · คนเรียกใช้ส่งค่าเอง (escape hatch)</h4>
+  <p class="given">ทีม campaign ส่ง <code>props.color="#FF6A00"</code> แทนชื่อ token</p>
+  <div class="chain"><span class="node"><i>comp</i>cml.comp.spinner.rive.color</span><span class="ar">→</span><span class="node"><i>ข้าม sys และ ref</i>ค่าดิบจากคนเรียกใช้</span><span class="ar">→</span><span class="node val"><i>value</i>#FF6A00</span></div>
+  <p class="why"><b>ทำไม:</b> ใช้ได้แต่จะไม่เปลี่ยนตาม surface หรือ theme อีก Wrapper ควรแสดง warning ใน dev mode และ document ต้องระบุว่า prop ไหนยอมให้ส่งค่าดิบ (สีได้, motion ไม่ได้)</p>
+</div>
+</section>
+
+<section id="d-scheme">
+<h2><span class="n">04</span>Motion scheme ควรเป็น mode ไม่ใช่ส่วนหนึ่งของชื่อ</h2>
+<p>ชื่อแบบ <code class="bad">motion.professional.transition.easein</code> รวมสามเรื่อง: ธีม, หมวด และรูปทรง curve ทำให้ token คูณกันเป็น 3 ชุดทุกครั้งที่เพิ่ม role และ component ต้องรู้ชื่อธีมตอน build</p>
+<div class="two">
+  <div class="layer"><b class="bad">ก่อน</b><span><code>motion.professional.transition.easein</code><br><code>motion.natural.transition.easein</code><br><code>motion.playful.transition.easein</code></span></div>
+  <div class="layer"><b class="good">หลัง</b><span><code>cml.sys.motion.transition.enter.scale</code><br>Figma: collection <i>Motion</i> มี 4 modes<br>Code: <code>&lt;MotionScheme value="playful"&gt;</code></span></div>
+</div>
+<p>ใน sys ให้ตั้งชื่อตาม <b>บทบาท</b> (enter, exit, change, emphasis, loop) ไม่ตามรูป curve เพราะ playful ใช้ spring แทน curve ชื่อ “easein” จะผิดทันที ชื่อ curve เก็บไว้ที่ ref</p>
+</section>
+
+<section id="d-naming">
+<h2><span class="n">05</span>Naming convention</h2>
+<pre class="code">cml.{tier}.{domain}.{category}.{role}.{variant}
+
+<span class="c">// tier     ref | sys | comp</span>
+<span class="c">// domain   motion | color | size | border-width | opacity</span>
+<span class="c">// category duration | easing | spring | transition | scale | offset | rotate | delay | playback</span>
+<span class="c">// role     enter | exit | change | emphasis | loop | spatial | effects</span>
+<span class="c">// variant  fade | scale | slide-up | pop | shake | default | fast ...</span>
+
+<span class="k">cml.ref.motion.duration.250</span>
+<span class="k">cml.ref.motion.easing.emphasized-decelerate</span>
+<span class="k">cml.ref.motion.spring.expressive-spatial-fast</span>
+<span class="k">cml.sys.motion.transition.enter.scale</span>
+<span class="k">cml.sys.motion.transition.emphasis.shake</span>
+<span class="k">cml.comp.spinner.container.enter</span>
+<span class="k">cml.comp.spinner.rive.status.error.color</span></pre>
+<ul>
+  <li><b>ตัวคั่น:</b> code ใช้ <code>.</code> ทั้งหมด Figma ใช้ <code>/</code> เพื่อทำ group ให้ tool export แปลง ไม่ผสมสองแบบในชื่อเดียว</li>
+  <li><b>ref ตั้งชื่อตามค่า</b>, <b>sys ตั้งชื่อตามบทบาท</b></li>
+  <li><b>start/end → from/to</b> ตรงกับภาษา animation ของทุก platform</li>
+  <li>ตัวพิมพ์เล็ก + kebab-case ในแต่ละ segment</li>
+</ul>
+</section>
+
+<section id="d-review">
+<h2><span class="n">06</span>รีวิว token ปัจจุบัน</h2>
+<div class="tscroll"><table>
+<thead><tr><th>ตอนนี้</th><th>ประเด็น</th><th>เสนอ</th></tr></thead>
+<tbody>
+<tr><td><code>cml.ref.motion/duration/short/100</code></td><td>ref มีคำว่า short ซึ่งเป็นความหมายของ sys</td><td><code>cml.ref.motion.duration.100</code></td></tr>
+<tr><td><code>cml.ref.opacity/opacity-full</code>, <code>opacity0</code></td><td>รูปแบบไม่ตรงกัน</td><td><code>cml.ref.opacity.0</code>, <code>cml.ref.opacity.100</code></td></tr>
+<tr><td><code>cml.ref.motion/scale/scale0</code></td><td>ซ้ำคำ scale</td><td><code>cml.ref.motion.scale.0</code>, <code>.scale.100</code></td></tr>
+<tr><td><code>…/fade/zero-to-full/start</code></td><td>บอกค่าในชื่อ semantic</td><td><code>cml.sys.motion.transition.enter.fade</code> (from/to อยู่ในค่า)</td></tr>
+<tr><td>Duration 4 ขั้น</td><td>หยาบไปสำหรับ exit และ micro-interaction</td><td>เพิ่ม ref 50–1000 แล้วให้ sys เลือก</td></tr>
+<tr><td>ไม่มี easing / spring</td><td>บุคลิกของ 3 ธีมมาจาก curve และ spring เป็นหลัก</td><td>เพิ่ม category easing, spring</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="d-cat">
+<h2><span class="n">07</span>Category ที่ควรมี</h2>
+<div class="tscroll"><table>
+<thead><tr><th>Category</th><th>ref ตัวอย่าง</th><th>sys ตัวอย่าง</th><th>ใช้ที่</th></tr></thead>
+<tbody>
+<tr><td><b>duration</b></td><td><code>duration.50 … 1000</code></td><td><code>duration.short / medium / long</code></td><td><span class="pill out">outer</span> <span class="pill in">inner spec</span></td></tr>
+<tr><td><b>easing</b></td><td><code>easing.standard</code>, <code>-accelerate</code>, <code>-decelerate</code>, <code>emphasized-*</code>, <code>linear</code></td><td>อยู่ใน transition</td><td><span class="pill out">outer</span> <span class="pill in">inner spec</span></td></tr>
+<tr><td><b>spring</b></td><td><code>spring.standard-spatial-*</code>, <code>expressive-spatial-*</code>, <code>*-effects-*</code></td><td><code>spring.spatial.default</code>, <code>spring.effects.default</code></td><td><span class="pill out">outer</span> <span class="pill in">inner spec</span></td></tr>
+<tr><td><b>transition</b> (composite)</td><td>–</td><td><code>transition.{enter|exit|change|emphasis|loop}.{pattern}</code></td><td><span class="pill out">outer</span></td></tr>
+<tr><td><b>scale · offset · rotate</b></td><td><code>scale.50/90/100</code>, <code>offset.8/16/24</code>, <code>rotate.10</code></td><td><code>scale.enter.from</code>, <code>scale.pressed</code></td><td><span class="pill out">outer</span> <span class="pill in">inner spec</span></td></tr>
+<tr><td><b>opacity</b></td><td><code>opacity.0 / 38 / 100</code></td><td><code>opacity.disabled</code></td><td>ทั้งสอง</td></tr>
+<tr><td><b>delay / stagger</b></td><td><code>delay.0 / 50 / 100</code></td><td><code>stagger.list-item</code></td><td><span class="pill out">outer</span></td></tr>
+<tr><td><b>playback</b></td><td><code>speed.50 / 100</code></td><td><code>rive.playback.speed</code></td><td><span class="pill in">inner</span></td></tr>
+</tbody></table></div>
+<p class="src">“inner spec” หมายถึง designer ใช้ค่านี้ตอนทำ timeline ใน Rive เพราะ easing ในไฟล์ถูก bake ไว้ ส่งค่าเข้าไปแทนจาก code ไม่ได้</p>
+</section>
+
+<section id="d-values">
+<h2><span class="n">08</span>ค่าของแต่ละ scheme</h2>
+<div class="tscroll"><table>
+<thead><tr><th>sys token</th><th>professional</th><th>natural</th><th>playful</th><th>reduced</th></tr></thead>
+<tbody>
+<tr><td><code>transition.enter.*</code></td><td>250ms · standard-decelerate</td><td>400ms · emphasized-decelerate</td><td>spring expressive-spatial-fast</td><td>150ms · linear · fade</td></tr>
+<tr><td><code>transition.exit.*</code></td><td>200ms · standard-accelerate</td><td>200ms · emphasized-accelerate</td><td>150ms · emphasized-accelerate</td><td>150ms · linear · fade</td></tr>
+<tr><td><code>transition.change.*</code></td><td>300ms · standard</td><td>450ms · emphasized-decelerate</td><td>spring</td><td>150ms · linear</td></tr>
+<tr><td><code>transition.emphasis.*</code></td><td>300ms · ระยะ ×0.5</td><td>450ms · ระยะ ×0.8</td><td>600ms · ระยะ ×1.4</td><td>opacity กระพริบ</td></tr>
+<tr><td><code>spring.spatial.default</code></td><td>k 700 · ζ 0.9</td><td>k 380 · ζ 0.8</td><td>k 800 · ζ 0.6</td><td>k 1600 · ζ 1</td></tr>
+<tr><td><code>spring.effects.default</code></td><td colspan="4">k 1600 · ζ 1 ทุก scheme (สีและ opacity ไม่ควร overshoot)</td></tr>
+<tr><td><code>scale.enter.from</code></td><td>0.96</td><td>0.90</td><td>0.50</td><td>1</td></tr>
+<tr><td><code>offset.enter</code></td><td>8px</td><td>16px</td><td>24px</td><td>0</td></tr>
+<tr><td><code>scale.hover / pressed</code></td><td>1.06 / 0.94</td><td>1.08 / 0.92</td><td>1.14 / 0.86</td><td>1 / 1</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="d-states">
+<h2><span class="n">09</span>State, status, surface</h2>
+<p>เดิมเรียกรวมว่า feedback &amp; emphasis ตอนนี้แยกเป็นแกนตามความหมาย แต่ละแกนเป็น property ของตัวเองใน View model</p>
+<div class="tscroll"><table>
+<thead><tr><th>แกน</th><th>ค่า</th><th>ใครเป็นคนตั้ง</th><th>ใน .riv ต้องมี</th></tr></thead>
+<tbody>
+<tr><td><b>state</b></td><td>idle · hover · focused · pressed · disabled</td><td><span class="own dev">Dev</span> คำนวณจาก event</td><td>animation ทุกค่า</td></tr>
+<tr><td><b>status</b></td><td>none · success · error · warning · info</td><td>คนเรียกใช้ส่ง prop</td><td>animation + glyph ทุกค่า</td></tr>
+<tr><td><b>surface</b></td><td>default · inverse</td><td>คนเรียกใช้ส่ง prop</td><td>แค่ binding สี</td></tr>
+<tr><td><b>scheme</b></td><td>professional · natural · playful · reduced</td><td>context หรือ prop</td><td>layer ต่อ scheme</td></tr>
+</tbody></table></div>
+<p><b>ลำดับความสำคัญ:</b> disabled &gt; status &gt; pressed &gt; hover / focused &gt; idle</p>
+</section>
+
+<section id="d-rive">
+<h2><span class="n">10</span>Contract ของไฟล์ Rive</h2>
+<pre class="code"><span class="c">// spinner.riv · contract v1</span>
+Artboard        <span class="s">"Spinner"</span>
+State machine   <span class="s">"SM_Main"</span>
+View model      <span class="s">"VM_Spinner"</span>
+
+state    : Enum     idle | hover | focused | pressed | disabled
+status   : Enum     none | success | error | warning | info
+surface  : Enum     default | inverse
+scheme   : Enum     professional | natural | playful | reduced
+color    : Color    <span class="c">// ← cml.sys.color.primary</span>
+size     : Number   <span class="c">// ← cml.sys.size.icon.md</span>
+stroke   : Number   <span class="c">// ← cml.sys.border-width.regular</span>
+speed    : Number   <span class="c">// ← cml.sys.motion.rive.playback.speed</span>
+exit     : Trigger
+
+<span class="c">// Events (Rive → code)</span>
+exitDone</pre>
+<ul>
+  <li>เงื่อนไข transition ใน <code>SM_Main</code> อ่านจาก property เหล่านี้</li>
+  <li>ใช้ enum แทน boolean หลายตัว เพื่อไม่ให้เกิด state ที่เป็นไปไม่ได้ และเพิ่ม state ได้โดยเพิ่มค่าใน enum</li>
+  <li>ค่าที่ไฟล์ไม่รู้จักให้แสดงเป็น idle ไฟล์เก่าจะไม่พังเมื่อ contract มีค่าใหม่</li>
+</ul>
+</section>
+
+<section id="d-api">
+<h2><span class="n">11</span>Component API</h2>
+<pre class="code">&lt;<span class="k">CmlRive</span>
+  src=<span class="s">"spinner.riv"</span>
+  motionScheme=<span class="s">"playful"</span>       <span class="c">// optional · ไม่ส่ง = ใช้ scheme ที่ครอบอยู่</span>
+  status=<span class="s">"success"</span>
+  surface=<span class="s">"default"</span>
+  disabled={<span class="k">false</span>}
+  props={{
+    color: <span class="s">"cml.sys.color.primary"</span>,
+    size: <span class="s">"cml.sys.size.icon.md"</span>,
+    stroke: <span class="s">"cml.sys.border-width.regular"</span>,
+  }}
+  transition={{
+    enter: <span class="s">"cml.sys.motion.transition.enter.scale"</span>,
+    exit: <span class="s">"cml.sys.motion.transition.exit.fade"</span>,
+  }}
+/&gt;</pre>
+</section>
+
+<section id="d-json">
+<h2><span class="n">12</span>รูปแบบไฟล์ token</h2>
+<p>แนะนำรูปแบบ W3C Design Tokens (DTCG) ซึ่งมี type <code>transition</code> แบบ composite อยู่แล้ว Spring ยังไม่อยู่ในมาตรฐาน จึงเก็บใน <code>$extensions</code> และเก็บที่มาไว้ที่เดียวกัน</p>
+<pre class="code">{
+  <span class="k">"cml.sys.motion.transition.enter.scale"</span>: {
+    <span class="k">"$type"</span>: <span class="s">"transition"</span>,
+    <span class="k">"$description"</span>: <span class="s">"ของที่ปรากฏขึ้นใหม่ในพื้นที่เดิม ขยายจากเล็กเล็กน้อย"</span>,
+    <span class="k">"$value"</span>: {
+      <span class="k">"duration"</span>: <span class="s">"{cml.ref.motion.duration.250}"</span>,
+      <span class="k">"delay"</span>: <span class="s">"{cml.ref.motion.delay.0}"</span>,
+      <span class="k">"timingFunction"</span>: <span class="s">"{cml.ref.motion.easing.standard-decelerate}"</span>
+    },
+    <span class="k">"$extensions"</span>: { <span class="k">"cml"</span>: {
+      <span class="k">"modes"</span>: {
+        <span class="k">"natural"</span>: { <span class="k">"duration"</span>: <span class="s">"{…duration.400}"</span>, <span class="k">"timingFunction"</span>: <span class="s">"{…easing.emphasized-decelerate}"</span> },
+        <span class="k">"playful"</span>: { <span class="k">"spring"</span>: <span class="s">"{cml.ref.motion.spring.expressive-spatial-fast}"</span> },
+        <span class="k">"reduced"</span>: { <span class="k">"duration"</span>: <span class="s">"{…duration.150}"</span>, <span class="k">"from"</span>: { <span class="k">"scale"</span>: <span class="s">1</span> } }
+      },
+      <span class="k">"from"</span>: { <span class="k">"opacity"</span>: <span class="s">0</span>, <span class="k">"scale"</span>: <span class="s">"{cml.sys.motion.scale.enter.from}"</span> },
+      <span class="k">"use"</span>: <span class="s">"toast, menu, spinner ที่โผล่ในที่เดิม"</span>,
+      <span class="k">"avoid"</span>: <span class="s">"การเปลี่ยนหน้าทั้งหน้า (ใช้ change.shared-axis)"</span>,
+      <span class="k">"source"</span>: <span class="s">"https://m3.material.io/styles/motion/easing-and-duration"</span>,
+      <span class="k">"since"</span>: <span class="s">"1.2.0"</span>
+    }}
+  }
+}</pre>
+</section>
+
+<section id="d-a11y">
+<h2><span class="n">13</span>Reduced motion และ accessibility</h2>
+<ul>
+  <li>Mode <b>reduced</b>: transition เหลือ fade, offset / scale / rotate = 0, spring ใช้ ζ 1 ไม่มี overshoot ลองได้ที่ปุ่ม Reduced ในแท็บ Mock และ Transitions</li>
+  <li>ใน .riv ให้ designer ทำ layer reduced ที่ loop ช้าลงแต่ยังสื่อว่ากำลังโหลด</li>
+  <li>Spinner ต้องมี <code>role="status"</code> และข้อความ “กำลังโหลด” เมื่อ status เปลี่ยนให้ประกาศผ่าน live region</li>
+  <li>Status มีทั้งสีและ glyph (✓ ✕ ! i) เสมอ</li>
+</ul>
+</section>
+
+<section id="d-todo">
+<h2><span class="n">14</span>ควรเพิ่มอะไร</h2>
+<ul>
+  <li>☐ ย้ายธีมออกจากชื่อ token ไปเป็น <b>mode</b> (professional / natural / playful / reduced)</li>
+  <li>☐ แก้ ref ให้ตั้งชื่อตามค่า และใช้ตัวคั่นแบบเดียวกัน</li>
+  <li>☐ เพิ่ม category easing, spring, offset, rotate, delay, playback</li>
+  <li>☐ เพิ่ม transition catalog (แท็บ Transitions) พร้อม use / avoid ของแต่ละตัว</li>
+  <li>☐ เขียน contract View model และทำ template .riv</li>
+  <li>☐ เพิ่ม field <b>source</b> และ <b>use / avoid</b> ให้ทุก sys token</li>
+  <li>☐ ทำ spring → <code>linear()</code> converter ใน build ของ token</li>
+  <li>☐ ทำ state matrix ต่อ component เป็นส่วนหนึ่งของ handoff</li>
+</ul>
+<p class="src">อ้างอิง: <a href="https://m3.material.io/styles/motion/overview" target="_blank" rel="noopener">M3 Motion</a> · <a href="https://m3.material.io/styles/motion/easing-and-duration" target="_blank" rel="noopener">M3 Easing and duration</a> · <a href="https://m3.material.io/styles/motion/transitions/transition-patterns" target="_blank" rel="noopener">M3 Transition patterns</a> · <a href="https://m3.material.io/foundations/interaction/states/overview" target="_blank" rel="noopener">M3 States</a> · <a href="https://pub.dev/documentation/motor/latest/" target="_blank" rel="noopener">ค่า spring M3 Expressive (motor)</a> · <a href="https://rive.app/docs/runtimes/inputs" target="_blank" rel="noopener">Rive: Inputs (deprecated)</a> · <a href="https://rive.app/docs/editor/data-binding" target="_blank" rel="noopener">Rive: Data binding</a> · <a href="https://tr.designtokens.org/format/" target="_blank" rel="noopener">W3C Design Tokens format</a></p>
+</section>
+
+</article>
+</div>
+</section>
+</main>
+
+<script>
+(()=>{
+/* ---------- tooltips ---------- */
+let tipN=0;
+document.querySelectorAll('[data-tip]').forEach(host=>{
+  const id='tip'+(++tipN),html=host.getAttribute('data-tip');host.removeAttribute('data-tip');
+  const wrap=document.createElement('span');wrap.className='tip';
+  wrap.innerHTML=`<button type="button" class="tip-btn" aria-describedby="${id}" aria-label="คำอธิบาย">i</button><span class="tip-body" role="tooltip" id="${id}">${html}</span>`;
+  host.replaceWith(wrap);
+  const body=wrap.querySelector('.tip-body'),btn=wrap.querySelector('.tip-btn');
+  const place=()=>{body.style.left='0px';const r=body.getBoundingClientRect(),vw=document.documentElement.clientWidth;if(r.right>vw-10)body.style.left=(vw-10-r.right)+'px';const r2=body.getBoundingClientRect();if(r2.left<10)body.style.left=(parseFloat(body.style.left)+10-r2.left)+'px'};
+  wrap.addEventListener('mouseenter',place);btn.addEventListener('focus',place);
+  btn.addEventListener('click',e=>{e.stopPropagation();document.querySelectorAll('.tip.open').forEach(t=>t!==wrap&&t.classList.remove('open'));wrap.classList.toggle('open');place()});
+});
+document.addEventListener('click',()=>document.querySelectorAll('.tip.open').forEach(t=>t.classList.remove('open')));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.tip.open').forEach(t=>t.classList.remove('open'))});
+
+/* ---------- tabs ---------- */
+const TABS=['mock','trans','hand','doc'];
+const PANELS={mock:'p-mock',trans:'p-trans',hand:'p-hand',doc:'p-doc'};
+function show(k){document.querySelectorAll('[role=tab]').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===k));TABS.forEach(n=>document.getElementById(PANELS[n]).hidden=n!==k)}
+document.querySelectorAll('[role=tab]').forEach(t=>t.onclick=()=>show(t.dataset.tab));
+const h=location.hash.slice(1);
+if(h==='transitions')show('trans');else if(h==='handoff')show('hand');else if(h==='doc'||h.startsWith('d-'))show('doc');
+
+/* ---------- data ---------- */
+const OS_REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SCHEMES={
+ professional:{desc:'นิ่ง ชัด ไม่มี overshoot ใช้ standard easing',
+   spring:{k:700,z:0.9,ref:'standard-spatial-default'},hover:1.06,press:0.94,amp:0.5,off:8,sf:0.96,rot:0,
+   t:{enter:{bez:[0,0,0,1],dur:250,name:'standard-decelerate'},exit:{bez:[0.3,0,1,1],dur:200,name:'standard-accelerate'},
+      change:{bez:[0.2,0,0,1],dur:300,name:'standard'},emphasis:{bez:[0.2,0,0,1],dur:300,name:'standard'},loop:{bez:[0.4,0,0.6,1],dur:2400,name:'standard'}}},
+ natural:{desc:'นุ่ม ไหลต่อเนื่อง ใช้ emphasized easing และ spring ช้ากว่า',
+   spring:{k:380,z:0.8,ref:'expressive-spatial-default'},hover:1.08,press:0.92,amp:0.8,off:16,sf:0.9,rot:0,
+   t:{enter:{bez:[0.05,0.7,0.1,1],dur:400,name:'emphasized-decelerate'},exit:{bez:[0.3,0,0.8,0.15],dur:200,name:'emphasized-accelerate'},
+      change:{bez:[0.05,0.7,0.1,1],dur:450,name:'emphasized-decelerate'},emphasis:{bez:[0.2,0,0,1],dur:450,name:'standard'},loop:{bez:[0.4,0,0.6,1],dur:3200,name:'standard'}}},
+ playful:{desc:'เด้ง มีบุคลิก ใช้ spring expressive ที่ overshoot เฉพาะ spatial',
+   spring:{k:800,z:0.6,ref:'expressive-spatial-fast'},hover:1.14,press:0.86,amp:1.4,off:24,sf:0.5,rot:-10,
+   t:{enter:{spring:true},exit:{bez:[0.3,0,0.8,0.15],dur:150,name:'emphasized-accelerate'},
+      change:{spring:true},emphasis:{bez:[0.2,0,0,1],dur:600,name:'standard'},loop:{bez:[0.4,0,0.6,1],dur:1600,name:'standard'}}},
+ reduced:{desc:'สำหรับผู้ใช้ที่ตั้งลดการเคลื่อนไหว: fade อย่างเดียว ไม่ขยับตำแหน่งหรือขนาด',reduced:true,
+   spring:{k:1600,z:1,ref:'standard-effects-default'},hover:1,press:1,amp:0,off:0,sf:1,rot:0,
+   t:{enter:{bez:[0,0,1,1],dur:150,name:'linear'},exit:{bez:[0,0,1,1],dur:150,name:'linear'},change:{bez:[0,0,1,1],dur:150,name:'linear'},
+      emphasis:{bez:[0,0,1,1],dur:300,name:'linear'},loop:{bez:[0,0,1,1],dur:2400,name:'linear'}}}
+};
+const COLORS=[
+ {v:'#3A55E6',inv:'#9DAAF3',sys:'cml.sys.color.primary',ref:'cml.ref.palette.cobalt.50',iref:'cml.ref.palette.cobalt.80'},
+ {v:'#14857A',inv:'#7FD1C6',sys:'cml.sys.color.secondary',ref:'cml.ref.palette.teal.50',iref:'cml.ref.palette.teal.80'},
+ {v:'#7A4BD6',inv:'#C3AAF2',sys:'cml.sys.color.tertiary',ref:'cml.ref.palette.violet.50',iref:'cml.ref.palette.violet.80'},
+ {v:'#2B2F36',inv:'#D5D9E0',sys:'cml.sys.color.on-surface',ref:'cml.ref.palette.neutral.20',iref:'cml.ref.palette.neutral.90'}];
+const SIZES={sm:{px:48,sys:'cml.sys.size.icon.sm'},md:{px:66,sys:'cml.sys.size.icon.md'},lg:{px:84,sys:'cml.sys.size.icon.lg'}};
+const STROKES={thin:{px:3,sys:'cml.sys.border-width.thin'},regular:{px:6,sys:'cml.sys.border-width.regular'},bold:{px:10,sys:'cml.sys.border-width.bold'}};
+const STATUS={success:{v:'#1E9E61',sys:'cml.sys.color.status.success',ref:'cml.ref.palette.green.45'},
+ error:{v:'#D93A3A',sys:'cml.sys.color.status.error',ref:'cml.ref.palette.red.50'},
+ warning:{v:'#E39A10',sys:'cml.sys.color.status.warning',ref:'cml.ref.palette.amber.60'},
+ info:{v:'#2F7BE0',sys:'cml.sys.color.status.info',ref:'cml.ref.palette.blue.55'}};
+const HOVER={v:'#EC4F8C',sys:'cml.sys.color.accent.pink',ref:'cml.ref.palette.pink.55'};
+const PRESS={v:'#F2B705',sys:'cml.sys.color.accent.yellow',ref:'cml.ref.palette.amber.70'};
+const DISABLED={v:'#8E949F',sys:'cml.sys.color.on-surface (38%)',ref:'cml.ref.palette.neutral.60 + opacity.38'};
+const S={scheme:OS_REDUCED?'reduced':'professional',hover:false,focus:false,press:false,disabled:false,status:'none',surface:'default',color:0,size:'md',stroke:'regular',enterP:'scale',exitP:'fade'};
+
+/* ---------- spring helpers ---------- */
+class Spring{constructor(v){this.x=v;this.v=0;this.t=v}
+ step(dt,k,z){const c=2*z*Math.sqrt(k),n=Math.max(1,Math.ceil(dt*480)),hh=dt/n;for(let i=0;i<n;i++){const a=-k*(this.x-this.t)-c*this.v;this.v+=a*hh;this.x+=this.v*hh}}
+ set(t){this.t=t}}
+const springCache={};
+function springLinear(k,z){const key=k+'_'+z;if(springCache[key])return springCache[key];
+ let x=0,v=0,t=0;const hh=1/1000,c=2*z*Math.sqrt(k),pts=[0];let next=1/60;
+ while(t<3){const a=-k*(x-1)-c*v;v+=a*hh;x+=v*hh;t+=hh;if(t>=next){pts.push(+x.toFixed(3));next+=1/60;if(Math.abs(1-x)<0.002&&Math.abs(v)<0.02)break}}
+ pts[pts.length-1]=1;return springCache[key]={easing:`linear(${pts.join(', ')})`,dur:Math.round(t*1000),n:pts.length}}
+function timing(role,scheme,forceSpring){const sc=SCHEMES[scheme],t=sc.t[role];
+ if(t.spring||(forceSpring&&!sc.reduced)){const r=springLinear(sc.spring.k,sc.spring.z);
+   return{dur:r.dur,easing:r.easing,label:`spring k ${sc.spring.k} · ζ ${sc.spring.z} → ${r.dur}ms`,ref:'spring.'+sc.spring.ref,durRef:'(คำนวณจาก spring)'}}
+ return{dur:t.dur,easing:`cubic-bezier(${t.bez.join(',')})`,label:`${t.dur}ms · ${t.name}`,ref:'easing.'+t.name,durRef:'duration.'+t.dur}}
+
+/* ---------- transition presets ---------- */
+const HL='rgba(58,85,230,';
+const PRESETS=[
+ {id:'fade',role:'enter',name:'Fade in',when:'ของเล็ก ๆ ที่โผล่ในที่เดิม เช่น tooltip, badge',kf:sc=>[{opacity:0},{opacity:1}]},
+ {id:'scale',role:'enter',name:'Scale in',when:'popup, menu, spinner ที่ปรากฏตรงจุดที่ผู้ใช้กำลังมอง',kf:sc=>[{opacity:0,transform:`scale(${sc.sf})`},{opacity:1,transform:'scale(1)'}]},
+ {id:'slide-up',role:'enter',name:'Slide up in',when:'ของที่เข้ามาจากขอบล่าง เช่น snackbar, bottom sheet',kf:sc=>[{opacity:0,transform:`translateY(${sc.off}px)`},{opacity:1,transform:'translateY(0)'}]},
+ {id:'pop',role:'enter',name:'Pop in',spring:true,when:'ช่วงเวลาที่อยากให้รู้สึกดี เช่น รางวัล, สำเร็จครั้งแรก ใช้ spring ทุก scheme',kf:sc=>[{opacity:0,transform:`scale(${Math.min(sc.sf,0.6)}) rotate(${sc.rot}deg)`},{opacity:1,transform:'scale(1) rotate(0deg)'}]},
+ {id:'grow',role:'enter',name:'Grow (reveal)',when:'เผยเนื้อหาจากตรงกลาง เช่น card ขยาย, preview รูป',kf:sc=>[{opacity:.4,clipPath:'inset(35% 35% 35% 35% round 14px)'},{opacity:1,clipPath:'inset(0% 0% 0% 0% round 14px)'}]},
+ {id:'fade',role:'exit',name:'Fade out',when:'ค่าเริ่มต้นสำหรับของที่หายไป รบกวนน้อยที่สุด',kf:sc=>[{opacity:1},{opacity:0}]},
+ {id:'scale',role:'exit',name:'Scale out',when:'คู่กับ scale in เช่น ปิด menu, spinner โหลดเสร็จ',kf:sc=>[{opacity:1,transform:'scale(1)'},{opacity:0,transform:`scale(${sc.sf})`}]},
+ {id:'slide-down',role:'exit',name:'Slide down out',when:'คู่กับ slide up in เช่น ปัด snackbar ออก',kf:sc=>[{opacity:1,transform:'translateY(0)'},{opacity:0,transform:`translateY(${sc.off}px)`}]},
+ {id:'shrink',role:'exit',name:'Shrink (collapse)',when:'คู่กับ grow เช่น ยุบ card กลับ',kf:sc=>[{opacity:1,clipPath:'inset(0% 0% 0% 0% round 14px)'},{opacity:0,clipPath:'inset(35% 35% 35% 35% round 14px)'}]},
+ {id:'crossfade',role:'change',name:'Crossfade',pair:true,when:'สลับเนื้อหาที่ขนาดเท่ากันในที่เดิม เช่น ไอคอน play ↔ pause',kfOut:sc=>[{opacity:1},{opacity:0}],kfIn:sc=>[{opacity:0},{opacity:1}]},
+ {id:'fade-through',role:'change',name:'Fade through',pair:true,when:'สลับเนื้อหาที่ไม่เกี่ยวกัน เช่น เปลี่ยน tab ใน bottom nav (M3)',kfOut:sc=>[{opacity:1},{opacity:0,offset:.35},{opacity:0}],kfIn:sc=>[{opacity:0,transform:'scale(.92)'},{opacity:0,transform:'scale(.92)',offset:.35},{opacity:1,transform:'scale(1)'}]},
+ {id:'shared-axis-x',role:'change',name:'Shared axis X',pair:true,when:'ไปข้างหน้า / ย้อนกลับในลำดับ เช่น stepper, onboarding (M3)',kfOut:sc=>[{opacity:1,transform:'translateX(0)'},{opacity:0,transform:`translateX(${-Math.max(sc.off*1.5,12)}px)`}],kfIn:sc=>[{opacity:0,transform:`translateX(${Math.max(sc.off*1.5,12)}px)`},{opacity:1,transform:'translateX(0)'}]},
+ {id:'shared-axis-y',role:'change',name:'Shared axis Y',pair:true,when:'เลื่อนในลำดับแนวตั้ง เช่น ตัวเลขนับขึ้น, carousel แนวตั้ง',kfOut:sc=>[{opacity:1,transform:'translateY(0)'},{opacity:0,transform:`translateY(${-Math.max(sc.off*1.5,12)}px)`}],kfIn:sc=>[{opacity:0,transform:`translateY(${Math.max(sc.off*1.5,12)}px)`},{opacity:1,transform:'translateY(0)'}]},
+ {id:'pulse',role:'emphasis',name:'Pulse',when:'ชวนให้มอง เช่น info ใหม่, ปุ่มที่ควรกดต่อ',kf:sc=>{const a=sc.amp;return[{transform:'scale(1)'},{transform:`scale(${1+0.08*a})`,offset:.4},{transform:'scale(1)'}]}},
+ {id:'shake',role:'emphasis',name:'Shake',when:'error เท่านั้น เช่น รหัสผิด, โหลดล้มเหลว',kf:sc=>{const x=8*sc.amp;return[0,-x,x,-x*.6,x*.6,0].map(v=>({transform:`translateX(${v}px)`}))}},
+ {id:'bounce',role:'emphasis',name:'Bounce',when:'success เช่น บันทึกสำเร็จ, ส่งแล้ว',kf:sc=>{const y=14*sc.amp,a=sc.amp;return[{transform:'translateY(0) scale(1,1)'},{transform:`translateY(${-y}px) scale(${1-0.04*a},${1+0.06*a})`,offset:.35},{transform:'translateY(0) scale(1,1)',offset:.7},{transform:`translateY(${-y*.3}px)`,offset:.85},{transform:'translateY(0)'}]}},
+ {id:'wiggle',role:'emphasis',name:'Wiggle',when:'warning หรือเตือนเบา ๆ เช่น ยังไม่ได้บันทึก',kf:sc=>{const r=6*sc.amp;return[0,-r,r,-r/2,0].map(v=>({transform:`rotate(${v}deg)`}))}},
+ {id:'highlight',role:'emphasis',name:'Highlight ring',when:'ชี้ตำแหน่งโดยไม่ขยับของ เช่น ผลค้นหา, จุดที่เพิ่งเปลี่ยน',kf:sc=>[{boxShadow:`0 0 0 0 ${HL}.55)`},{boxShadow:`0 0 0 ${Math.round(6+10*Math.max(sc.amp,.6))}px ${HL}0)`}]},
+ {id:'breathe',role:'loop',name:'Breathe',iter:3,when:'รอแบบไม่รีบ เช่น placeholder, ไมค์กำลังฟัง',kf:sc=>[{transform:'scale(1)'},{transform:`scale(${1+0.05*Math.max(sc.amp,.4)})`},{transform:'scale(1)'}]},
+ {id:'float',role:'loop',name:'Float',iter:3,when:'ของตกแต่งที่ไม่ต้องการความสนใจ เช่น ภาพ empty state',kf:sc=>{const y=6*Math.max(sc.amp,.4);return[{transform:'translateY(0)'},{transform:`translateY(${-y}px)`},{transform:'translateY(0)'}]}},
+ {id:'shimmer',role:'loop',name:'Shimmer',iter:3,when:'skeleton loading ระหว่างรอข้อมูล',kf:sc=>[{opacity:1},{opacity:.45},{opacity:1}]}
+];
+const ROLES={
+ enter:{title:'Enter',desc:'ของที่ปรากฏขึ้นใหม่ ใช้ decelerate: เร็วตอนเริ่ม ชะลอตอนถึง'},
+ exit:{title:'Exit',desc:'ของที่ออกไป ใช้ accelerate และสั้นกว่า enter เพราะผู้ใช้ไม่ต้องดูจนจบ'},
+ change:{title:'Change',desc:'สลับเนื้อหาในพื้นที่เดิม อิง M3 transition patterns'},
+ emphasis:{title:'Emphasis',desc:'ดึงความสนใจโดยไม่เปลี่ยน state ใช้เท่าที่จำเป็น'},
+ loop:{title:'Loop',desc:'เคลื่อนไหวต่อเนื่องระหว่างรอ ต้องเบาและหยุดได้'}};
+const preset=(role,id)=>PRESETS.find(p=>p.role===role&&p.id===id);
+function reduceKf(kfs){const hasOp=kfs.some(f=>f.opacity!==undefined);
+ if(hasOp)return kfs.map(f=>{const o={opacity:f.opacity??1};if(f.offset!==undefined)o.offset=f.offset;return o});
+ return[{opacity:1},{opacity:.55},{opacity:1}]}
+function kfFor(p,sc,which){let k=which==='in'?p.kfIn(sc):which==='out'?p.kfOut(sc):p.kf(sc);return sc.reduced?reduceKf(k):k}
+function animOpts(p,scheme){const t=timing(p.role,scheme,p.spring);return{t,opts:{duration:t.dur,easing:t.easing,fill:'both',iterations:p.iter||1}}}
+
+/* ---------- shapes ---------- */
+const N=180;
+function resample(src){const L=[0];for(let i=1;i<=src.length;i++){const a=src[i-1],b=src[i%src.length];L.push(L[i-1]+Math.hypot(b[0]-a[0],b[1]-a[1]))}
+ const tot=L[L.length-1],out=[];let j=0;for(let i=0;i<N;i++){const t=i*tot/N;while(L[j+1]<t)j++;const a=src[j],b=src[(j+1)%src.length],f=(t-L[j])/((L[j+1]-L[j])||1);out.push([a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f])}return out}
+function fit(p,r){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;p.forEach(([x,y])=>{x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)});
+ const cx=(x0+x1)/2,cy=(y0+y1)/2,s=2*r/Math.max(x1-x0,y1-y0);return p.map(([x,y])=>[(x-cx)*s,(y-cy)*s])}
+const circle=resample(Array.from({length:720},(_,i)=>{const a=-Math.PI/2+2*Math.PI*i/720;return[Math.cos(a),Math.sin(a)]}));
+const heart=resample(fit(Array.from({length:720},(_,i)=>{const t=2*Math.PI*i/720,s=Math.sin(t);return[16*s*s*s,-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))]}),1.08));
+const star=resample((()=>{const v=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?0.5:1.15;v.push([Math.cos(a)*r,Math.sin(a)*r+0.06])}return v})());
+const SHAPES={circle,heart,star};
+
+/* ---------- state logic (what the wrapper does) ---------- */
+function computeState(){return S.disabled?'disabled':S.press?'pressed':S.hover?'hover':S.focus?'focused':'idle'}
+function visual(){const sc=SCHEMES[S.scheme],c=COLORS[S.color];
+ if(S.disabled)return{shape:'circle',color:DISABLED.v,fill:0,glyph:'none',scale:1,idle:true,still:true,tok:'disabled'};
+ if(S.status!=='none')return{shape:'circle',color:STATUS[S.status].v,fill:1,glyph:S.status,scale:1,tok:'status'};
+ if(S.press)return{shape:'star',color:PRESS.v,fill:1,glyph:'none',scale:sc.press,tok:'pressed'};
+ if(S.hover||S.focus)return{shape:'heart',color:HOVER.v,fill:1,glyph:'none',scale:sc.hover,tok:'hover'};
+ return{shape:'circle',color:S.surface==='inverse'?c.inv:c.v,fill:0,glyph:'none',scale:1,idle:true,tok:'idle'}}
+
+/* ---------- canvas ---------- */
+const cv=document.getElementById('rive'),ctx=cv.getContext('2d');
+let DPR=Math.min(2,window.devicePixelRatio||1);cv.width=200*DPR;cv.height=200*DPR;
+const hex=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16));
+const mix=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
+let cur=circle.map(p=>p.slice()),from=cur,toKey='circle';
+const morph=new Spring(1),scale=new Spring(1),spin=new Spring(0),arc=new Spring(0.28),fill=new Spring(0),glyph=new Spring(0),colT=new Spring(1),alpha=new Spring(1);
+let colFrom=hex(COLORS[0].v),colTo=colFrom,colKey=COLORS[0].v,curCol=colFrom,glyphKind='none';
+let last=performance.now(),T=0;
+function frame(now){const dt=Math.min(0.05,(now-last)/1000);last=now;T+=dt;
+ const sc=SCHEMES[S.scheme],vis=visual();
+ if(vis.shape!==toKey){from=cur.map(p=>p.slice());toKey=vis.shape;morph.x=0;morph.v=0;morph.set(1)}
+ if(vis.color!==colKey){colFrom=curCol.slice();colTo=hex(vis.color);colKey=vis.color;colT.x=0;colT.v=0;colT.set(1)}
+ if(vis.glyph!=='none')glyphKind=vis.glyph;
+ glyph.set(vis.glyph==='none'?0:1);fill.set(vis.fill);alpha.set(vis.still?0.45:1);
+ let sMul=1;
+ if(vis.idle){
+   let speed=0.9,a=0.28;
+   if(S.scheme==='natural'){const b=0.5-0.5*Math.cos(T*2.2);speed=0.45+0.6*b;a=0.12+0.42*b}
+   if(S.scheme==='playful'){speed=1.25;a=0.3;sMul=1+0.05*Math.sin(T*9)}
+   if(S.scheme==='reduced'){speed=0.3}
+   if(vis.still)speed=0;
+   spin.x+=speed*2*Math.PI*dt;spin.v=0;spin.t=spin.x;arc.set(a)
+ }else{const tw=2*Math.PI;spin.set(Math.ceil(spin.x/tw-0.02)*tw);arc.set(1)}
+ scale.set(vis.scale);
+ const k=sc.spring.k,z=sc.spring.z;
+ morph.step(dt,k,z);scale.step(dt,k,z);if(!vis.idle)spin.step(dt,k,Math.max(z,0.85));
+ arc.step(dt,800,1);fill.step(dt,1600,1);glyph.step(dt,1600,1);colT.step(dt,1600,1);alpha.step(dt,1600,1);
+ const tgt=SHAPES[toKey],m=morph.x;cur=from.map((p,i)=>[p[0]+(tgt[i][0]-p[0])*m,p[1]+(tgt[i][1]-p[1])*m]);
+ curCol=mix(colFrom,colTo,Math.min(1,Math.max(0,colT.x)));
+ draw(sMul);requestAnimationFrame(frame)}
+function draw(sMul){const W=cv.width,R=SIZES[S.size].px*DPR*0.5*scale.x*sMul,sw=STROKES[S.stroke].px*DPR;
+ ctx.clearRect(0,0,W,W);ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,alpha.x));ctx.translate(W/2,W/2);ctx.rotate(spin.x);
+ const pts=cur.map(([x,y])=>[x*R,y*R]);
+ ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();
+ const rgb=curCol.map(v=>Math.round(Math.max(0,Math.min(255,v)))).join(',');
+ const fa=Math.max(0,Math.min(1,fill.x));
+ if(fa>0.01){ctx.fillStyle=`rgba(${rgb},${fa})`;ctx.fill()}
+ let L=0;for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];L+=Math.hypot(b[0]-a[0],b[1]-a[1])}
+ const vv=Math.max(0.02,Math.min(1,arc.x));
+ ctx.setLineDash(vv>=0.999?[]:[vv*L,L]);ctx.lineWidth=sw;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=`rgb(${rgb})`;ctx.stroke();
+ ctx.restore();
+ const ga=Math.max(0,Math.min(1,glyph.x));
+ if(ga>0.01){ctx.save();ctx.translate(W/2,W/2);ctx.globalAlpha=ga;ctx.strokeStyle='#fff';ctx.fillStyle='#fff';ctx.lineWidth=Math.max(3*DPR,sw*0.9);ctx.lineCap='round';ctx.lineJoin='round';
+  const g=R*0.42*(0.7+0.3*ga);ctx.beginPath();
+  if(glyphKind==='success'){ctx.moveTo(-g*0.8,0);ctx.lineTo(-g*0.2,g*0.6);ctx.lineTo(g*0.9,-g*0.6);ctx.stroke()}
+  else if(glyphKind==='error'){ctx.moveTo(-g*0.6,-g*0.6);ctx.lineTo(g*0.6,g*0.6);ctx.moveTo(g*0.6,-g*0.6);ctx.lineTo(-g*0.6,g*0.6);ctx.stroke()}
+  else if(glyphKind==='warning'){ctx.moveTo(0,-g*0.75);ctx.lineTo(0,g*0.2);ctx.stroke();ctx.beginPath();ctx.arc(0,g*0.72,ctx.lineWidth*0.6,0,7);ctx.fill()}
+  else if(glyphKind==='info'){ctx.moveTo(0,-g*0.1);ctx.lineTo(0,g*0.75);ctx.stroke();ctx.beginPath();ctx.arc(0,-g*0.7,ctx.lineWidth*0.6,0,7);ctx.fill()}
+  ctx.restore()}}
+requestAnimationFrame(frame);
+
+/* ---------- interaction ---------- */
+let inside=false;
+cv.addEventListener('pointerenter',e=>{inside=true;if(e.pointerType==='mouse'&&!S.disabled){S.hover=true;ui()}});
+cv.addEventListener('pointerleave',()=>{inside=false;if(!S.press){S.hover=false;ui()}});
+cv.addEventListener('pointerdown',e=>{if(S.disabled)return;cv.setPointerCapture(e.pointerId);S.press=true;ui()});
+const up=e=>{S.press=false;S.hover=e.pointerType==='mouse'&&inside&&!S.disabled;ui()};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+cv.addEventListener('focus',()=>{if(cv.matches(':focus-visible')){S.focus=true;ui()}});
+cv.addEventListener('blur',()=>{S.focus=false;S.press=false;ui()});
+cv.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!S.disabled){e.preventDefault();S.focus=true;if(!S.press){S.press=true;ui()}}});
+cv.addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='Enter'){S.press=false;ui()}});
+
+/* ---------- controls ---------- */
+function segBind(el,cb){el.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!el.contains(b))return;el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));cb(b.dataset.v)})}
+const sw=document.getElementById('sw');
+COLORS.forEach((c,i)=>{const b=document.createElement('button');b.className='sw';b.style.background=c.v;b.setAttribute('aria-label',c.sys);b.title=c.sys;b.setAttribute('aria-pressed',i===0);
+ b.onclick=()=>{S.color=i;sw.querySelectorAll('.sw').forEach((x,j)=>x.setAttribute('aria-pressed',j===i));ui()};sw.appendChild(b)});
+function fillSeg(name,obj,curK){const el=document.querySelector(`[data-seg="${name}"]`);Object.keys(obj).forEach(k=>{const b=document.createElement('button');b.dataset.v=k;b.textContent=k;b.setAttribute('aria-pressed',k===curK);el.appendChild(b)})}
+fillSeg('size',SIZES,'md');fillSeg('stroke',STROKES,'regular');
+['size','stroke','status','surface'].forEach(n=>segBind(document.querySelector(`[data-seg="${n}"]`),v=>{S[n]=v;ui()}));
+document.querySelectorAll('[data-sync="scheme"]').forEach(el=>segBind(el,v=>{S.scheme=v;syncScheme();ui();updateCards();if(!document.getElementById('p-mock').hidden)playEnter()}));
+function syncScheme(){document.querySelectorAll('[data-sync="scheme"] button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===S.scheme));document.querySelectorAll('.scheme-desc').forEach(p=>p.textContent=SCHEMES[S.scheme].desc)}
+document.getElementById('cb-disabled').onchange=e=>{S.disabled=e.target.checked;if(S.disabled){S.hover=false;S.press=false}ui()};
+const selE=document.getElementById('sel-enter'),selX=document.getElementById('sel-exit');
+PRESETS.filter(p=>p.role==='enter').forEach(p=>selE.add(new Option(p.name,p.id,false,p.id===S.enterP)));
+PRESETS.filter(p=>p.role==='exit').forEach(p=>selX.add(new Option(p.name,p.id,false,p.id===S.exitP)));
+selE.onchange=()=>{S.enterP=selE.value;ui();playEnter()};selX.onchange=()=>{S.exitP=selX.value;ui()};
+
+/* ---------- outer (mock) ---------- */
+const host=document.getElementById('host');let anim=null;
+function playOn(el,p,which){const sc=SCHEMES[S.scheme],{t,opts}=animOpts(p,S.scheme);return{a:el.animate(kfFor(p,sc,which),opts),t}}
+function playEnter(){if(anim)anim.cancel();const p=preset('enter',S.enterP),r=playOn(host,p);anim=r.a;writeCSS(p,r.t);return anim}
+function playExit(){if(anim)anim.cancel();const p=preset('exit',S.exitP),r=playOn(host,p);anim=r.a;writeCSS(p,r.t);return anim}
+function emphId(){return{error:'shake',success:'bounce',warning:'wiggle'}[S.status]||'pulse'}
+document.getElementById('b-enter').onclick=playEnter;
+document.getElementById('b-exit').onclick=playExit;
+document.getElementById('b-swap').onclick=()=>{const a=playExit();a.finished.then(()=>setTimeout(playEnter,80)).catch(()=>{})};
+document.getElementById('b-emph').onclick=()=>{if(anim)anim.cancel();host.style.opacity='';const p=preset('emphasis',emphId()),r=playOn(host,p);anim=null;r.a.finished.then(()=>r.a.cancel()).catch(()=>{});writeCSS(p,r.t)};
+function writeCSS(p,t){const e=t.easing.length>64?t.easing.slice(0,58)+' …)':t.easing;
+ document.getElementById('css-out').innerHTML=
+`<span class="c">/* cml.sys.motion.transition.${p.role}.${p.id} · ${S.scheme} */</span>
+<span class="k">duration</span>: <span class="s">${t.dur}ms</span>;   <span class="c">/* ${t.durRef} */</span>
+<span class="k">easing</span>: <span class="s">${e}</span>;
+<span class="c">/* ${t.ref} */</span>`}
+
+/* ---------- readouts ---------- */
+const esc=s=>String(s).replace(/</g,'&lt;');
+function ui(){const sc=SCHEMES[S.scheme],st=computeState(),vis=visual(),c=COLORS[S.color];
+ document.getElementById('sh-scheme').textContent='motionScheme: '+S.scheme;
+ document.getElementById('sh-state').textContent=`state: ${st} · status: ${S.status}`;
+ document.querySelectorAll('#state-pills .statepill').forEach(p=>p.classList.toggle('on',p.dataset.v===st));
+ document.getElementById('stage').classList.toggle('inverse',S.surface==='inverse');
+ const colHex=S.surface==='inverse'?c.inv:c.v;
+ document.getElementById('vm-out').innerHTML=
+`<span class="c">VM_Spinner</span>
+  <span class="k">state  </span>: <span class="s">"${st}"</span>      <span class="c">// Dev คำนวณ</span>
+  <span class="k">status </span>: <span class="s">"${S.status}"</span>
+  <span class="k">surface</span>: <span class="s">"${S.surface}"</span>
+  <span class="k">scheme </span>: <span class="s">"${S.scheme}"</span>
+  <span class="k">color  </span>: <span class="s">${colHex}</span>
+  <span class="k">size   </span>: <span class="s">${SIZES[S.size].px}</span>
+  <span class="k">stroke </span>: <span class="s">${STROKES[S.stroke].px}</span>`;
+ document.getElementById('api-out').innerHTML=
+`&lt;<span class="k">CmlRive</span>
+  src=<span class="s">"spinner.riv"</span>
+  motionScheme=<span class="s">"${S.scheme}"</span>
+  status=<span class="s">"${S.status}"</span>
+  surface=<span class="s">"${S.surface}"</span>
+  disabled={<span class="k">${S.disabled}</span>}
+  props={{
+    color: <span class="s">"${c.sys}"</span>,
+    size: <span class="s">"${SIZES[S.size].sys}"</span>,
+    stroke: <span class="s">"${STROKES[S.stroke].sys}"</span>,
+  }}
+  transition={{
+    enter: <span class="s">"cml.sys.motion.transition.enter.${S.enterP}"</span>,
+    exit: <span class="s">"cml.sys.motion.transition.exit.${S.exitP}"</span>,
+  }}
+/&gt;`;
+ // resolution rows
+ const en=timing('enter',S.scheme,preset('enter',S.enterP).spring),ex=timing('exit',S.scheme),em=timing('emphasis',S.scheme);
+ let colRow;
+ if(vis.tok==='disabled')colRow=['spinner.rive.state.disabled.color',DISABLED.sys,DISABLED.ref,DISABLED.v,'M3 ใช้ on-surface ที่ opacity 38% สำหรับ disabled ให้ดูจางแต่ยังอ่านรูปทรงได้'];
+ else if(vis.tok==='status'){const s=STATUS[S.status];colRow=[`spinner.rive.status.${S.status}.color`,s.sys,s.ref,s.v,'สีบอกความหมายของผลลัพธ์ ใช้ชุด status ร่วมกับทุก component ไม่ตั้งสีเฉพาะ spinner']}
+ else if(vis.tok==='pressed')colRow=['spinner.rive.state.pressed.color',PRESS.sys,PRESS.ref,PRESS.v,'สีของ state กดเป็นส่วนหนึ่งของบุคลิก spinner ตัวนี้ จึงเป็น token แยกจากสีหลัก'];
+ else if(vis.tok==='hover')colRow=[`spinner.rive.state.${st==='focused'?'focused':'hover'}.color`,HOVER.sys,HOVER.ref,HOVER.v,'hover และ focused ใช้หน้าตาเดียวกัน (ตาม M3 ทั้งสองเป็น state ที่บอกว่าพร้อมให้กด)'];
+ else if(S.surface==='inverse')colRow=['spinner.rive.color','cml.sys.color.inverse-'+c.sys.split('.').pop(),c.iref,c.inv,'บนพื้นเข้มสีปกติ contrast ต่ำ จึงสลับเป็นคู่ inverse เปลี่ยนแค่สี ไม่ต้องมี animation ใหม่'];
+ else colRow=['spinner.rive.color',c.sys,c.ref,c.v,'สีหลักตอน idle มาจากที่คนเรียกใช้ส่ง ค่าเริ่มต้นคือ primary'];
+ const rows=[
+  ['spinner.container.enter',`cml.sys.motion.transition.enter.${S.enterP}`,`${en.durRef} + ${en.ref}`,en.label.replace(/ → .*/,''),'dev',sc.reduced?'reduced: เหลือแค่ fade 150ms เพื่อไม่ให้ผู้ใช้ที่ไวต่อการเคลื่อนไหวเวียนหัว':en.ref.startsWith('spring')?'playful ใช้ spring ที่ overshoot เล็กน้อยให้รู้สึกเด้ง':'ของที่เข้ามาใช้ decelerate: เร็วตอนเริ่ม ชะลอตอนถึง ทำให้ตาจับตำแหน่งสุดท้ายได้'],
+  ['spinner.container.exit',`cml.sys.motion.transition.exit.${S.exitP}`,`${ex.durRef} + ${ex.ref}`,ex.label,'dev','ของที่ออกไปใช้ accelerate และสั้นกว่า enter เพราะผู้ใช้ไม่ต้องดูจนจบ'],
+  [`spinner.container.emphasis`,`cml.sys.motion.transition.emphasis.${emphId()}`,`${em.durRef} + ${em.ref}`,em.label,'dev',`เลือกจาก status: ${S.status==='none'?'ไม่มี status จึงใช้ pulse':S.status+' → '+emphId()} ให้รูปแบบการขยับบอกความหมายตรงกันทุก component`],
+  ['spinner.rive.morph','cml.sys.motion.spring.spatial.default','spring.'+sc.spring.ref,`k ${sc.spring.k} · ζ ${sc.spring.z}`,'rive','การเปลี่ยนรูปร่างเป็น spatial motion ใช้ spring ของ scheme Designer ใช้ค่านี้ตอนทำ timeline เพราะ code ส่งเข้าไปแทนไม่ได้'],
+  ['spinner.rive.color-change','cml.sys.motion.spring.effects.default','spring.standard-effects-default','k 1600 · ζ 1','rive','สีเป็น effect ไม่ควรเด้งเกินค่าเป้าหมาย ทุก scheme จึงใช้ค่าเดียวกัน'],
+  [colRow[0],colRow[1],colRow[2],colRow[3],'ds',colRow[4]],
+  ['spinner.rive.state.pressed.scale','cml.sys.motion.scale.pressed',`cml.ref.motion.scale.${Math.round(sc.press*100)}`,sc.press,'rive','ยุบลงตอนกดให้รู้ว่าระบบรับรู้แล้ว playful ยุบมากที่สุด reduced ไม่ยุบ'],
+  ['spinner.rive.size',SIZES[S.size].sys,`cml.ref.size.${SIZES[S.size].px}`,SIZES[S.size].px+'px','dev','ผูก property size ใน View model เปลี่ยนแล้วไม่ต้องมี animation ใหม่'],
+  ['spinner.rive.stroke',STROKES[S.stroke].sys,`cml.ref.border-width.${STROKES[S.stroke].px}`,STROKES[S.stroke].px+'px','dev','ความหนาเส้นมาจาก border-width ชุดเดียวกับ component อื่น ให้น้ำหนักเส้นทั้งระบบเท่ากัน']];
+ const ownL={dev:'<span class="own dev">Dev</span>',rive:'<span class="own rive">Rive spec</span>',ds:'<span class="own ds">DS</span>'};
+ document.getElementById('res').innerHTML=rows.map(r=>`<tr><td><code>cml.comp.${esc(r[0])}</code></td><td><code>${esc(r[1])}</code></td><td><code>${esc(r[2].startsWith('cml')||r[2].startsWith('(')?r[2]:'cml.ref.motion.'+r[2].replace(' + ',' + cml.ref.motion.'))}</code></td><td>${esc(r[3])}</td><td>${ownL[r[4]]}</td><td>${esc(r[5])}</td></tr>`).join('')}
+
+/* ---------- catalog ---------- */
+const cat=document.getElementById('catalog');const cards=[];
+const ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>';
+Object.entries(ROLES).forEach(([role,info])=>{
+ const g=document.createElement('div');g.className='tgroup';
+ g.innerHTML=`<div class="tgroup-head"><h3>${info.title}</h3><p>${info.desc}</p></div><div class="cards"></div>`;
+ const grid=g.querySelector('.cards');
+ PRESETS.filter(p=>p.role===role).forEach(p=>{
+  const c=document.createElement('div');c.className='card';
+  c.innerHTML=`<button class="pv" aria-label="เล่น ${p.name}"><span class="pv-item a">${p.pair?'A':ICON}</span>${p.pair?'<span class="pv-item b">B</span>':''}</button>
+   <div class="card-body"><div class="card-top"><b>${p.name}</b><button class="play">Play</button></div>
+   <code class="tok">cml.sys.motion.transition.${role}.${p.id}</code>
+   <p>${p.when}</p><div class="meta"></div></div>`;
+  grid.appendChild(c);
+  const st={p,el:c,a:c.querySelector('.pv-item.a'),b:c.querySelector('.pv-item.b'),shown:'a',anims:[]};
+  const run=()=>playCard(st);c.querySelector('.pv').onclick=run;c.querySelector('.play').onclick=run;
+  cards.push(st)});
+ cat.appendChild(g)});
+function playCard(st){const p=st.p,sc=SCHEMES[S.scheme];st.anims.forEach(a=>a.cancel());st.anims=[];
+ const {opts}=animOpts(p,S.scheme);
+ if(p.pair){const out=st.shown==='a'?st.a:st.b,inn=st.shown==='a'?st.b:st.a;
+   const a1=out.animate(kfFor(p,sc,'out'),opts),a2=inn.animate(kfFor(p,sc,'in'),opts);st.anims=[a1,a2];
+   a2.finished.then(()=>{inn.style.opacity='1';out.style.opacity='0';a1.cancel();a2.cancel();st.shown=st.shown==='a'?'b':'a'}).catch(()=>{});return a2}
+ const a=st.a.animate(kfFor(p,sc),opts);st.anims=[a];
+ a.finished.then(()=>setTimeout(()=>a.cancel(),p.role==='exit'?450:0)).catch(()=>{});return a}
+function updateCards(){cards.forEach(st=>{const t=timing(st.p.role,S.scheme,st.p.spring),sc=SCHEMES[S.scheme];
+ let extra='';if(st.p.role==='emphasis'||st.p.role==='loop')extra=sc.reduced?' · เหลือ opacity':` · ระยะ ×${sc.amp}`;
+ else if(['scale','pop'].includes(st.p.id))extra=sc.reduced?' · ไม่ scale':` · from ${st.p.id==='pop'?Math.min(sc.sf,0.6):sc.sf}`;
+ else if(/slide|axis/.test(st.p.id))extra=sc.reduced?' · ไม่เลื่อน':` · ${st.p.id.includes('axis')?Math.max(sc.off*1.5,12):sc.off}px`;
+ if(st.p.iter)extra+=` · ×${st.p.iter} รอบ (demo)`;
+ st.el.querySelector('.meta').textContent=t.label+extra})}
+document.getElementById('b-playall').onclick=()=>cards.forEach((st,i)=>setTimeout(()=>playCard(st),i*70));
+
+syncScheme();ui();updateCards();writeCSS(preset('enter',S.enterP),timing('enter',S.scheme));
+})();
+</script>
+
+</body></html>
