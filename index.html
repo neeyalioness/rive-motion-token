@@ -316,6 +316,30 @@ td code{white-space:nowrap}
 .ck.info .ck-ic{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
 .cmode{margin-bottom:2px}.cmode>label{font:400 12.5px var(--f-mono);color:var(--muted)}
 #cmode-note{font-size:12.5px;background:var(--sunk);padding:6px 10px;border-radius:7px}
+.thead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px 28px;flex-wrap:wrap;margin-bottom:16px}
+.thead-t{flex:1 1 420px;min-width:0}.thead-t .sub{margin-bottom:0}
+.thead-a{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-top:6px}
+.thead-l{font:500 11.5px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.thead-a .seg{align-items:center}.btn.sm{padding:5px 11px;font-size:12.5px}
+#dl-msg{max-width:300px;text-align:right}
+@media (max-width:880px){.thead-a{align-items:flex-start}#dl-msg{text-align:left}}
+.ctl-panel .controls{max-height:640px;overflow-y:auto;margin-right:-8px;padding-right:8px}
+.ck-fold{padding:8px 0 0;list-style:none}
+.ck-fold summary{cursor:pointer;font:500 12.5px var(--f-mono);color:var(--ok);padding:4px 0;list-style:none;display:flex;gap:8px;align-items:center}
+.ck-fold summary::-webkit-details-marker{display:none}
+.ck-fold summary::before{content:"";width:6px;height:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.ck-fold details[open] summary::before{transform:rotate(45deg)}
+.ck-fold .checks{margin-top:4px}
+.tlog{margin-top:20px}.tlog .log{max-height:220px}
+@media (max-width:880px){.ctl-panel .controls{max-height:none;overflow:visible;margin-right:0;padding-right:0}}
+.samples{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.samples li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.samples li:last-child{border-bottom:0}
+.samples .sm-b{display:flex;flex-direction:column;min-width:0}
+.samples .sm-b b{font-size:13.5px}.samples .sm-b span{font-size:12.5px;color:var(--muted)}
+.samples .sm-a{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.samples .btn{padding:6px 10px;font-size:12.5px}
+#dl-msg{font-size:12.5px}
 .ck-b{display:flex;flex-direction:column;min-width:0}
 .ck-b b{font:500 12.5px var(--f-mono);word-break:break-word}
 .ck-b span{color:var(--muted);word-break:break-word}
@@ -617,8 +641,21 @@ td code{white-space:nowrap}
 
 <!-- ================= TESTER ================= -->
 <section id="p-test" role="tabpanel" aria-labelledby="t-test" hidden>
-  <h2 class="sec">Rive contract tester</h2>
-  <p class="sub">ลากไฟล์ .riv มาวาง หน้านี้จะเปิดไฟล์ด้วย Rive runtime ตัวจริง (เวอร์ชันเดียวกับที่ dev ใช้) ใช้กับไฟล์ Rive ไหนก็ได้: สร้างปุ่มจาก View model หรือ inputs ที่มีในไฟล์จริงให้เปลี่ยนค่าดูผลได้ทันที และถ้าเป็นไฟล์ spinner จะตรวจกับ contract ให้ด้วย <b>Designer</b> ใช้ตรวจก่อนส่งไฟล์ <b>Dev</b> ใช้ทดสอบไฟล์ที่ได้รับ ไฟล์ไม่ถูกอัปโหลดไปไหน เปิดอยู่ในเบราว์เซอร์ของคุณเท่านั้น</p>
+  <div class="thead">
+    <div class="thead-t">
+      <h2 class="sec">Rive contract tester</h2>
+      <p class="sub">ลากไฟล์ .riv มาวาง แล้วลองเปลี่ยนค่าดูผลได้ทันทีด้วย Rive runtime ตัวเดียวกับที่ dev ใช้ ใช้ได้กับไฟล์ Rive ทุกแบบ และถ้าเป็นไฟล์ spinner จะตรวจกับ contract ให้ ไฟล์เปิดอยู่ในเบราว์เซอร์ของคุณเท่านั้น</p>
+    </div>
+    <div class="thead-a">
+      <span class="thead-l">ไฟล์ตัวอย่าง · CML Spinner</span>
+      <div class="seg">
+        <button class="btn sm" type="button" data-sample-open="cml">เปิด</button>
+        <button class="btn sm" type="button" id="b-dl-sample" hidden>ดาวน์โหลด .zip</button>
+        <span data-tip="ไฟล์ spinner ที่ผ่าน Spinner contract v1 ครบ<br><br>ดาวน์โหลดเป็น <b>.zip</b> เพราะหน้านี้บันทึกไฟล์ .riv ตรง ๆ ไม่ได้ แตก zip แล้วใช้ไฟล์ <code>cml-spinner.riv</code> ข้างในได้เลย"></span>
+      </div>
+      <p class="muted" id="dl-msg" aria-live="polite" hidden></p>
+    </div>
+  </div>
 
   <div class="tester">
     <div class="tcol">
@@ -634,8 +671,7 @@ td code{white-space:nowrap}
           <canvas id="riv-canvas" aria-label="ตัวอย่างไฟล์ Rive"></canvas>
           <div class="tstage-empty" id="tstage-empty">
             <p>ยังไม่มีไฟล์</p>
-            <button class="btn" id="b-sample" type="button">ลองด้วยไฟล์ตัวอย่างของ Rive</button>
-            <span class="src">ไฟล์ทดสอบ data binding จาก rive-app/rive-wasm (MIT) ไม่ตรง contract ของเรา จึงจะเห็นตัวอย่างผลตรวจที่ไม่ผ่านด้วย</span>
+            <button class="btn primary" type="button" data-sample-open="cml">เปิด CML Spinner ตัวอย่าง</button>
           </div>
           <div class="tstatus" id="tstatus" hidden></div>
         </div>
@@ -645,28 +681,23 @@ td code{white-space:nowrap}
           <label class="toggle tw"><input type="checkbox" id="cb-wrap" checked><span>จำลอง wrapper: เมาส์และคีย์บอร์ดบน canvas เปลี่ยน <code>state</code></span><span data-tip="ทำแบบที่ wrapper ของ dev จะทำ: ชี้ = hover, กดค้าง = pressed, Tab มาที่ canvas = focused, ออก = idle<br><br>ทำงานเมื่อไฟล์มี enum ชื่อ <code>state</code> และมีค่าเหล่านี้"></span></label>
         </div>
       </div>
-
       <div class="panel group">
-        <h3>Controls <span data-tip="ปุ่มสร้างจาก property ของ View model ที่ผูกกับ artboard นี้ทั้งหมด ไม่ได้อ่านจาก contract จึงใช้กับไฟล์ไหนก็ได้<br><br>กดแล้วหน้านี้เขียนค่าลงไฟล์ผ่าน runtime แบบเดียวกับที่ dev เขียนใน code"></span><span class="spacer"></span><small id="vm-name">ยังไม่มี View model</small></h3>
-        <div id="controls" class="controls"><p class="muted">เปิดไฟล์ก่อน แล้วปุ่มของแต่ละ property จะขึ้นที่นี่</p></div>
-      </div>
-    </div>
-
-    <div class="tcol">
-      <div class="panel group">
-        <h3><span id="chk-title">ผลตรวจ contract</span> <span data-tip="เทียบไฟล์กับ <b>Spinner contract v1</b> (Doc ข้อ 10)<br><br><b>✕</b> ต้องแก้ก่อนส่ง dev ไม่อย่างนั้น code จะเปลี่ยนค่าไม่ได้<br><b>!</b> ใช้ได้แต่ควรแก้<br><b>…</b> ตรวจจากไฟล์ไม่ได้ ต้องลองเล่น"></span><span class="spacer"></span><span class="score" id="score">รอไฟล์</span></h3>
+        <h3><span id="chk-title">สรุปไฟล์</span> <span data-tip="เทียบไฟล์กับ <b>Spinner contract v1</b> (Doc ข้อ 10)<br><br><b>✕</b> ต้องแก้ก่อนส่ง dev ไม่อย่างนั้น code จะเปลี่ยนค่าไม่ได้<br><b>!</b> ใช้ได้แต่ควรแก้<br><b>…</b> ตรวจจากไฟล์ไม่ได้ ต้องลองเล่น"></span><span class="spacer"></span><span class="score" id="score">รอไฟล์</span></h3>
         <div class="row cmode"><label for="sel-contract">ตรวจกับ</label><span class="select"><select id="sel-contract">
+          <option value="none" selected>ไม่ตรวจ contract (ไฟล์ทั่วไป)</option>
           <option value="spinner">Spinner contract v1</option>
-          <option value="none">ไม่ตรวจ contract (ไฟล์ทั่วไป)</option>
-        </select></span><span data-tip="<b>Spinner contract v1</b> ตรวจว่าไฟล์พร้อมใช้กับ component spinner ของเรา<br><br><b>ไม่ตรวจ contract</b> สำหรับไฟล์ Rive ทั่วไป หน้านี้จะสรุปสิ่งที่มีในไฟล์และเตือนเฉพาะเรื่องที่ทำให้ใช้บนเว็บไม่ได้<br><br>ถ้าไฟล์ไม่มีทั้ง artboard Spinner และ VM_Spinner หน้านี้จะเลือก “ไม่ตรวจ” ให้อัตโนมัติ"></span></div>
+        </select></span><span data-tip="<b>Spinner contract v1</b> ตรวจว่าไฟล์พร้อมใช้กับ component spinner ของเรา<br><br><b>ไม่ตรวจ contract</b> สำหรับไฟล์ Rive ทั่วไป หน้านี้จะสรุปสิ่งที่มีในไฟล์และเตือนเฉพาะเรื่องที่ทำให้ใช้บนเว็บไม่ได้<br><br>ค่าเริ่มต้นคือ “ไม่ตรวจ” ถ้าไฟล์มีโครงแบบ spinner หน้านี้จะบอกให้ และเลือกที่ค้างไว้จะใช้กับไฟล์ถัดไปด้วย"></span></div>
         <p class="muted" id="cmode-note" hidden></p>
         <ul class="checks" id="checks"></ul>
       </div>
-
-      <div class="panel group">
-        <h3>Log <span data-tip="<b>code → Rive</b> คือค่าที่หน้านี้เขียนลงไป<br><b>Rive → code</b> คือค่าที่ไฟล์เปลี่ยนเอง เช่น listener ในไฟล์ หรือ state machine ตั้งค่ากลับ<br><b>event</b> คือ Rive Event แบบเก่า (deprecated) แสดงไว้สำหรับไฟล์เก่า"></span><span class="spacer"></span><button class="play" id="b-clear" type="button">ล้าง</button></h3>
-        <ol class="log" id="log" aria-live="polite"><li class="muted">ยังไม่มีอะไรเกิดขึ้น</li></ol>
+    </div>
+    <div class="tcol">
+      <div class="panel group ctl-panel">
+        <h3>Controls <span data-tip="ปุ่มสร้างจาก property ของ View model ที่ผูกกับ artboard นี้ทั้งหมด ไม่ได้อ่านจาก contract จึงใช้กับไฟล์ไหนก็ได้<br><br>กดแล้วหน้านี้เขียนค่าลงไฟล์ผ่าน runtime แบบเดียวกับที่ dev เขียนใน code"></span><span class="spacer"></span><small id="vm-name">ยังไม่มี View model</small></h3>
+        <div id="controls" class="controls"><p class="muted">เปิดไฟล์ก่อน แล้วปุ่มของแต่ละ property จะขึ้นที่นี่</p></div>
       </div>
+
+      
     </div>
   </div>
 
@@ -679,6 +710,13 @@ td code{white-space:nowrap}
       <h3>ข้อมูลในไฟล์ <span data-tip="ทุกอย่างที่ runtime อ่านได้จากไฟล์: artboard, state machine, inputs แบบเก่า, View model และ enum"></span></h3>
       <div class="panel tinfo" id="t-info"><p class="muted">เปิดไฟล์ก่อน</p></div>
     </div>
+  </div>
+
+  <div class="tlog">
+    <div class="panel group">
+        <h3>Log <span data-tip="<b>code → Rive</b> คือค่าที่หน้านี้เขียนลงไป<br><b>Rive → code</b> คือค่าที่ไฟล์เปลี่ยนเอง เช่น listener ในไฟล์ หรือ state machine ตั้งค่ากลับ<br><b>event</b> คือ Rive Event แบบเก่า (deprecated) แสดงไว้สำหรับไฟล์เก่า"></span><span class="spacer"></span><button class="play" id="b-clear" type="button">ล้าง</button></h3>
+        <ol class="log" id="log" aria-live="polite"><li class="muted">ยังไม่มีอะไรเกิดขึ้น</li></ol>
+      </div>
   </div>
 </section>
 
@@ -1449,7 +1487,7 @@ const TYPE={enumType:'Enum',number:'Number',integer:'Integer',boolean:'Boolean',
 const $=id=>document.getElementById(id);
 const escH=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cv=$('riv-canvas');
-let RT=null,loading=null,R=null,buf=null,fname='',sel={ab:null,sm:null},vmi=null,seen=new Set(),contents=null,gen=0,lastSet={},ctrlUpd={},mode='spinner',modeAuto=true,smInputs=[];
+let RT=null,loading=null,R=null,buf=null,fname='',sel={ab:null,sm:null},vmi=null,seen=new Set(),contents=null,gen=0,lastSet={},ctrlUpd={},mode='none',modeAuto=true,smInputs=[];
 
 function loadRuntime(){if(RT)return Promise.resolve(RT);if(loading)return loading;
  loading=new Promise((res,rej)=>{const s=document.createElement('script');s.src=`https://cdn.jsdelivr.net/npm/@rive-app/canvas@${RIVE_VER}/rive.js`;
@@ -1467,7 +1505,7 @@ $('b-clear').onclick=()=>{$('log').innerHTML='<li class="muted">ยังไม�
 /* ---------- open file ---------- */
 function openFile(file){if(!file)return;if(!/\.riv$/i.test(file.name)){status('bad',`“${file.name}” ไม่ใช่ไฟล์ .riv เลือกไฟล์ที่ export จาก Rive Editor`);return}
  const fr=new FileReader();fr.onload=()=>openBuffer(fr.result,file.name,file.size);fr.onerror=()=>status('bad','อ่านไฟล์ไม่ได้ ลองเลือกใหม่อีกครั้ง');fr.readAsArrayBuffer(file)}
-function openBuffer(ab,name,size){buf=ab;fname=name;sel={ab:null,sm:null};seen=new Set();modeAuto=true;
+function openBuffer(ab,name,size){buf=ab;fname=name;sel={ab:null,sm:null};seen=new Set();
  $('drop-title').textContent=name;$('drop-sub').textContent=`${(size/1024).toFixed(0)} KB · คลิกหรือลากไฟล์ใหม่มาวางเพื่อเปลี่ยน`;
  $('drop').classList.add('has');log('sys',`เปิด ${name}`);start()}
 $('riv-file').onchange=e=>{openFile(e.target.files[0]);e.target.value=''};
@@ -1475,9 +1513,36 @@ const drop=$('drop');
 ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
 ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
 drop.addEventListener('drop',e=>openFile(e.dataTransfer.files[0]));
-$('b-sample').onclick=async()=>{status('wait','กำลังโหลดไฟล์ตัวอย่าง…');
- try{const r=await fetch('samples/data_bind_runtime_test.b64.txt');if(!r.ok)throw 0;const bin=atob((await r.text()).trim()),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);const ab=u8.buffer;openBuffer(ab,'data_bind_runtime_test.riv',ab.byteLength)}
- catch(e){status('bad','โหลดไฟล์ตัวอย่างไม่ได้ ลองลากไฟล์ .riv ของคุณเองมาวางแทน')}};
+const SAMPLES={
+ cml:{file:'cml-spinner.riv',src:'samples/cml-spinner.b64.txt',title:'CML Spinner'}};
+const sampleCache={};
+async function sampleBytes(k){if(sampleCache[k])return sampleCache[k];const r=await fetch(SAMPLES[k].src);if(!r.ok)throw new Error('fetch');
+ const bin=atob((await r.text()).trim()),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return sampleCache[k]=u8}
+async function openSample(k){status('wait','กำลังโหลดไฟล์ตัวอย่าง…');
+ try{const u8=await sampleBytes(k);const ab=u8.slice().buffer;openBuffer(ab,SAMPLES[k].file,ab.byteLength)}
+ catch(e){status('bad','โหลดไฟล์ตัวอย่างไม่ได้ ลองลากไฟล์ .riv ของคุณเองมาวางแทน')}}
+/* minimal zip (store) so a .riv can be saved through the downloads capability */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(u8){let c=0xFFFFFFFF;for(let i=0;i<u8.length;i++)c=CRC[(c^u8[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function zipOne(name,data){const nm=new TextEncoder().encode(name),crc=crc32(data),n=data.length,d=new Date();
+ const dt=((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate(),tm=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1);
+ const lh=new DataView(new ArrayBuffer(30));[[0,0x04034b50,4],[4,20,2],[6,0,2],[8,0,2],[10,tm,2],[12,dt,2],[14,crc,4],[18,n,4],[22,n,4],[26,nm.length,2],[28,0,2]].forEach(([o,v,z])=>z==4?lh.setUint32(o,v,true):lh.setUint16(o,v,true));
+ const ch=new DataView(new ArrayBuffer(46));[[0,0x02014b50,4],[4,20,2],[6,20,2],[8,0,2],[10,0,2],[12,tm,2],[14,dt,2],[16,crc,4],[20,n,4],[24,n,4],[28,nm.length,2],[30,0,2],[32,0,2],[34,0,2],[36,0,2],[38,0,4],[42,0,4]].forEach(([o,v,z])=>z==4?ch.setUint32(o,v,true):ch.setUint16(o,v,true));
+ const cdOff=30+nm.length+n,cdLen=46+nm.length;
+ const ed=new DataView(new ArrayBuffer(22));[[0,0x06054b50,4],[4,0,2],[6,0,2],[8,1,2],[10,1,2],[12,cdLen,4],[16,cdOff,4],[20,0,2]].forEach(([o,v,z])=>z==4?ed.setUint32(o,v,true):ed.setUint16(o,v,true));
+ return new Blob([lh,nm,data,ch,nm,ed],{type:'application/zip'})}
+let DL=null;
+(async()=>{for(let i=0;i<25&&!(window.claude&&window.claude.use);i++)await new Promise(r=>setTimeout(r,200));
+ try{DL=window.claude&&window.claude.use?await window.claude.use('downloads'):null}catch(e){DL=null}renderSamples()})();
+window.__zipOne=zipOne;
+function dlMsg(t){const m=$('dl-msg');m.hidden=!t;m.textContent=t||''}
+async function downloadSample(k,btn){if(!DL)return;const sp=SAMPLES[k];btn.disabled=true;dlMsg('');
+ try{const u8=await sampleBytes(k);await DL.save({filename:sp.file.replace(/\.riv$/,'')+'.zip',data:zipOne(sp.file,u8)});dlMsg(`บันทึก ${sp.file.replace(/\.riv$/,'')}.zip แล้ว แตกไฟล์เพื่อใช้ ${sp.file}`)}
+ catch(e){const c=e&&e.code;dlMsg(c==='declined'?'ยกเลิกการดาวน์โหลดแล้ว':c==='rate_limited'?'มีหน้าต่างดาวน์โหลดเปิดอยู่ ลองอีกครั้งในอีกสักครู่':'ดาวน์โหลดจากมุมมองนี้ไม่ได้ ลองเปิดหน้านี้ใน claude.ai')}
+ finally{btn.disabled=false}}
+function renderSamples(){const b=$('b-dl-sample');b.hidden=!DL;b.onclick=()=>downloadSample('cml',b)}
+renderSamples();
+document.querySelectorAll('[data-sample-open]').forEach(b=>b.onclick=()=>openSample(b.dataset.sampleOpen));
 
 /* ---------- run ---------- */
 async function start(){const my=++gen;status('wait','กำลังเปิดไฟล์ด้วย Rive runtime…');$('tstage-empty').hidden=true;
@@ -1500,7 +1565,7 @@ function loaded(rt,my){contents=R.contents||{artboards:[]};const abs=contents.ar
  try{smInputs=sel.sm?(R.stateMachineInputs(sel.sm)||[]):[]}catch(e){smInputs=[]}
  if(modeAuto){let vmNames=[];try{for(let i=0;i<R.viewModelCount;i++){const v=R.viewModelByIndex(i);if(v)vmNames.push(v.name)}}catch(e){}
   const looksSpinner=(contents.artboards||[]).some(a=>a.name===CONTRACT.artboard)||vmNames.includes(CONTRACT.viewModel);
-  setMode(looksSpinner?'spinner':'none',!looksSpinner)}
+  setMode('none',false);$('cmode-note').hidden=!looksSpinner;if(looksSpinner)$('cmode-note').textContent='ไฟล์นี้มีโครงแบบ spinner เลือก “Spinner contract v1” ด้านบนเพื่อตรวจว่าพร้อมส่ง dev'}
  R.on(rt.EventType.RiveEvent,e=>{const n=e.data&&e.data.name;if(!n)return;log('ev',n);if(!seen.has(n)){seen.add(n);renderChecks()}});
  status(null);fillPickers();render(rt);
  log('sys',`artboard “${sel.ab}” · state machine “${sel.sm||'ไม่มี'}” · View model “${vmi?vmi.viewModelName:'ไม่ได้ผูก'}”`)}
@@ -1565,7 +1630,12 @@ function check(){if(mode==='none')return checkGeneral();const out=[],add=(st,lab
  if(vmi&&props.some(x=>x.name==='exitDone'&&x.type==='trigger'))add(seen.has('exitDone')?'ok':'wait','ไฟล์ยิง exitDone กลับมาจริง',seen.has('exitDone')?'ได้รับระหว่างทดสอบ':'ตรวจจากไฟล์อย่างเดียวไม่ได้ กดปุ่ม “ยิง exit” แล้วรอให้ exitDone ขึ้นใน Log แบบ Rive → code');
  return out}
 function renderChecks(){const list=check(),ic={ok:'✓',bad:'✕',warn:'!',wait:'…',info:'i'};
- $('checks').innerHTML=list.map(c=>`<li class="ck ${c.st}"><span class="ck-ic" aria-label="${c.st}">${ic[c.st]}</span><span class="ck-b"><b>${escH(c.label)}</b>${c.detail?`<span>${escH(c.detail)}</span>`:''}</span></li>`).join('');
+ const li=c=>`<li class="ck ${c.st}"><span class="ck-ic" aria-label="${c.st}">${ic[c.st]}</span><span class="ck-b"><b>${escH(c.label)}</b>${c.detail?`<span>${escH(c.detail)}</span>`:''}</span></li>`;
+ const oks=list.filter(c=>c.st==='ok'),rest=list.filter(c=>c.st!=='ok');
+ if(contents&&mode==='spinner'&&oks.length>3){
+  const wasOpen=!!document.querySelector('#checks details[open]');
+  $('checks').innerHTML=rest.map(li).join('')+`<li class="ck-fold"><details${wasOpen?' open':''}><summary>ผ่านแล้ว ${oks.length} ข้อ</summary><ul class="checks">${oks.map(li).join('')}</ul></details></li>`}
+ else $('checks').innerHTML=list.map(li).join('');
  const sc=$('score');if(!contents){sc.textContent='รอไฟล์';sc.className='score';return}
  if(mode==='none'){const w=list.filter(c=>c.st==='warn').length;sc.textContent=w?`ข้อควรรู้ ${w} ข้อ`:'เปิดไฟล์ได้';sc.className='score '+(w?'':'ok');return}
  const n=list.filter(c=>c.st!=='wait').length,ok=list.filter(c=>c.st==='ok').length,bad=list.filter(c=>c.st==='bad').length;
