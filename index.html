@@ -313,13 +313,28 @@ td code{white-space:nowrap}
 .tstage.sized #riv-canvas{width:var(--cs);height:var(--cs);flex:none;outline:1px dashed color-mix(in srgb,var(--muted) 55%,transparent);outline-offset:2px}
 .tstage.bg-light{--stage-bg:#FFFFFF;--stage-grid:transparent}
 .tstage.bg-dark{--stage-bg:#14161B;--stage-grid:transparent}
-.tbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 16px;border-top:1px solid var(--line)}
-.tbar .grp{display:flex;align-items:center;gap:6px}
-.tbar .gl{font:11px var(--f-mono);color:var(--muted)}
-.tbar .seg{gap:4px;flex-wrap:nowrap}
-.tbar .seg button,.tbar .btn{padding:4px 9px;font-size:12px;line-height:1.4}
-.tbar .btn:disabled{opacity:.45;cursor:default}
-.tbar .grow{flex:1}
+.pbar{display:grid;grid-template-columns:auto auto 1fr auto auto;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+.pbar .pl{font-size:12px;color:var(--muted);white-space:nowrap}
+.pbar .pc{display:flex;align-items:center;gap:8px;min-width:0}
+.pbar .c4{grid-column:4}.pbar .c5{grid-column:5}
+.pbar .pplay{grid-column:1/3;display:flex;gap:8px}
+.pbar .pshare{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.pbar .pshare[hidden]{display:none}
+@media (max-width:560px){.pbar{grid-template-columns:auto 1fr}.pbar .c4{grid-column:1}.pbar .c5{grid-column:2}.pbar .pshare{flex-wrap:wrap}}
+.segj{display:inline-flex;padding:2px;gap:2px;border:1px solid var(--line);border-radius:8px;background:var(--sunk)}
+.segj button{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);font:500 12px/1 var(--f-body);height:26px;padding:0 10px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.segj button:hover{color:var(--ink)}
+.segj button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0/.14)}
+.segj button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.ibtn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:500 12px/1 var(--f-body);cursor:pointer;white-space:nowrap}
+.ibtn svg{width:14px;height:14px;flex:none}
+.ibtn:hover:not(:disabled){border-color:var(--muted)}
+.ibtn:disabled{opacity:.45;cursor:default}
+.ibtn[hidden]{display:none}
+.swd{width:12px;height:12px;border-radius:3px;border:1px solid var(--line);flex:none}
+.swd.grid{background-color:#fff;background-image:linear-gradient(45deg,#D5D9E0 25%,transparent 25%,transparent 75%,#D5D9E0 75%),linear-gradient(45deg,#D5D9E0 25%,transparent 25%,transparent 75%,#D5D9E0 75%);background-size:6px 6px;background-position:0 0,3px 3px}
+.swd.light{background:#fff}
+.swd.dark{background:#14161B;border-color:#14161B}
 .csub{padding:10px 0 2px;font:600 11.5px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line)}
 .muted{color:var(--muted);font-size:13px;margin:0}
 .score{font:500 12px var(--f-mono);padding:3px 9px;border-radius:999px;background:var(--sunk);color:var(--muted)}
@@ -694,13 +709,12 @@ td code{white-space:nowrap}
           </div>
           <div class="tstatus" id="tstatus" hidden></div>
         </div>
-        <div class="tbar" id="tbar">
-          <div class="grp"><button class="btn" type="button" id="b-play" disabled>หยุด</button><button class="btn" type="button" id="b-restart" disabled>เริ่มใหม่</button></div>
-          <div class="grp"><span class="gl">ความเร็ว</span><div class="seg" id="seg-speed"><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="0.5">0.5×</button><button type="button" data-v="0.25">0.25×</button></div></div>
-          <div class="grp"><span class="gl">ขนาด</span><div class="seg" id="seg-size"><button type="button" data-v="24">24</button><button type="button" data-v="48">48</button><button type="button" data-v="96">96</button><button type="button" data-v="0" aria-pressed="true">เต็ม</button></div></div>
-          <div class="grp"><span class="gl">พื้น</span><div class="seg" id="seg-bg"><button type="button" data-v="grid" aria-pressed="true">ตาราง</button><button type="button" data-v="light">สว่าง</button><button type="button" data-v="dark">มืด</button></div><span data-tip="<b>ความเร็ว</b> เล่นช้าลงเพื่อดู easing และ transition ระหว่าง state ไม่ได้แก้ค่าในไฟล์<br><br><b>ขนาด</b> แสดงที่ขนาดจริงเป็น px เส้นประคือขอบของ canvas ใช้ดูว่าเส้นบางหรือรายละเอียดเล็กยังอ่านออกไหม<br><br><b>พื้น</b> ใช้ “มืด” คู่กับ <code>surface: inverse</code> ดูว่าสีจมกับพื้นไหม<br><br><b>เริ่มใหม่</b> เปิดไฟล์ใหม่ ค่าที่ปรับไว้จะกลับเป็นค่าในไฟล์"></span></div>
-          <span class="grow"></span>
-          <button class="btn" type="button" id="b-share" hidden>คัดลอกลิงก์</button>
+        <div class="pbar" id="pbar">
+          <div class="pplay"><button class="ibtn" type="button" id="b-play" disabled></button><button class="ibtn" type="button" id="b-restart" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>เริ่มใหม่</button></div>
+          <span class="pl c4">ความเร็ว</span><div class="pc c5"><div class="segj" id="seg-speed" role="group" aria-label="ความเร็ว"><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="0.5">0.5×</button><button type="button" data-v="0.25">0.25×</button></div></div>
+          <span class="pl">ขนาด</span><div class="pc"><div class="segj" id="seg-size" role="group" aria-label="ขนาด"><button type="button" data-v="24">24</button><button type="button" data-v="48">48</button><button type="button" data-v="96">96</button><button type="button" data-v="0" aria-pressed="true">เต็ม</button></div></div>
+          <span class="pl c4">พื้นหลัง</span><div class="pc c5"><div class="segj" id="seg-bg" role="group" aria-label="พื้นหลัง preview"><button type="button" data-v="grid" aria-pressed="true"><i class="swd grid"></i>ตาราง</button><button type="button" data-v="light"><i class="swd light"></i>ขาว</button><button type="button" data-v="dark"><i class="swd dark"></i>เข้ม</button></div><span data-tip="<b>ความเร็ว</b> เล่นช้าลงเพื่อดู easing และ transition ระหว่าง state ไม่ได้แก้ค่าในไฟล์<br><br><b>ขนาด</b> แสดงที่ขนาดจริงเป็น px เส้นประคือขอบของ canvas ใช้ดูว่าเส้นบางหรือรายละเอียดเล็กยังอ่านออกไหม<br><br><b>พื้นหลัง</b> สีพื้นหลังของกล่อง preview ด้านบน ไม่ได้อยู่ในไฟล์ ใช้ “เข้ม” คู่กับ <code>surface: inverse</code> ดูว่าสีจมกับพื้นไหม<br><br><b>เริ่มใหม่</b> เปิดไฟล์ใหม่ ค่าที่ปรับไว้จะกลับเป็นค่าในไฟล์"></span></div>
+          <div class="pshare" id="share-row" hidden><span class="pl">ส่งสถานะนี้ให้ทีม: ไฟล์ ค่าที่ตั้ง และการแสดงผล</span><button class="ibtn" type="button" id="b-share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>คัดลอกลิงก์</button></div>
         </div>
         <div class="tpickers">
           <div class="row"><label for="sel-ab">artboard</label><span class="select"><select id="sel-ab" disabled><option>–</option></select></span></div>
@@ -1619,7 +1633,7 @@ function loaded(rt,my){contents=R.contents||{artboards:[]};const abs=contents.ar
   const looksSpinner=(contents.artboards||[]).some(a=>a.name===CONTRACT.artboard)||vmNames.includes(CONTRACT.viewModel);
   setMode('none',false);$('cmode-note').hidden=!looksSpinner;if(looksSpinner)$('cmode-note').textContent='ไฟล์นี้มีโครงแบบ spinner เลือก “Spinner contract v1” ด้านบนเพื่อตรวจว่าพร้อมส่ง dev'}
  R.on(rt.EventType.RiveEvent,e=>{const n=e.data&&e.data.name;if(!n)return;log('ev',n);if(!seen.has(n)){seen.add(n);renderChecks()}});
- status(null);fillPickers();render(rt);updPlay();$('b-share').hidden=FRAMED;applyStage();applyPending();
+ status(null);fillPickers();render(rt);updPlay();$('share-row').hidden=FRAMED;applyStage();applyPending();
  log('sys',`artboard “${sel.ab}” · state machine “${sel.sm||'ไม่มี'}” · View model “${vmi?vmi.viewModelName:'ไม่ได้ผูก'}”${vmi?` · instance “${instLabel()}”`:''}`)}
 /* ---------- View model instances ---------- */
 function instNames(){try{return VM?(VM.instanceNames||[]).filter(n=>n!==''):[]}catch(e){return[]}}
@@ -1850,9 +1864,10 @@ const segPick=(id,fn)=>$(id).addEventListener('click',e=>{const b=e.target.close
 segPick('seg-speed',v=>{SPEED=+v;log('sys',`ความเร็ว ${v}×`)});
 segPick('seg-size',v=>{SIZE=+v;log('sys',SIZE?`ขนาด ${SIZE}px`:'ขนาดเต็มกล่อง')});
 segPick('seg-bg',v=>{BG=v});
-function updPlay(){const b=$('b-play'),ok=!!(R&&contents);b.disabled=!ok;$('b-restart').disabled=!buf;b.textContent=ok&&!R.isPlaying?'เล่นต่อ':'หยุด'}
+function updPlay(){const b=$('b-play'),ok=!!(R&&contents);b.disabled=!ok;$('b-restart').disabled=!buf;const paused=ok&&!R.isPlaying;b.innerHTML=paused?'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>เล่นต่อ':'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>หยุด'}
 $('b-play').onclick=()=>{if(!R)return;try{if(R.isPlaying){R.pause();log('sys','หยุด')}else{R.play();log('sys','เล่นต่อ')}}catch(e){}updPlay()};
 $('b-restart').onclick=()=>{if(buf){log('sys','เริ่มใหม่');start()}};
+updPlay();
 
 /* ---------- reduced motion ---------- */
 function rmProp(){const p=vmi?prop('enumType','scheme'):null;return p&&p.values&&p.values.includes('reduced')?p:null}
@@ -1880,8 +1895,8 @@ function shareURL(){const q=new URLSearchParams();q.set('f',fromSample||fname);i
   q.set('v.'+pd.name,String(v))});
  return location.origin+location.pathname+'?'+q.toString()+'#tester'}
 $('b-share').onclick=async()=>{const u=shareURL(),b=$('b-share');try{history.replaceState(null,'',u)}catch(e){}
- try{await navigator.clipboard.writeText(u);b.textContent='คัดลอกแล้ว'}catch(e){b.textContent='ลิงก์อยู่ในแถบที่อยู่แล้ว'}
- log('sys','สร้างลิงก์สถานะนี้');setTimeout(()=>b.textContent='คัดลอกลิงก์',2200)};
+ try{await navigator.clipboard.writeText(u);b.lastChild.textContent='คัดลอกแล้ว'}catch(e){b.lastChild.textContent='ลิงก์อยู่ในแถบที่อยู่แล้ว'}
+ log('sys','สร้างลิงก์สถานะนี้');setTimeout(()=>b.lastChild.textContent='คัดลอกลิงก์',2200)};
 function applyPending(){if(!PENDING||!PENDING.started)return;const P=PENDING;PENDING=null;let n=0;
  if(vmi){const fl=flat();Object.entries(P.vals).forEach(([name,v])=>{const pd=fl.find(x=>x.name===name);if(!pd)return;const p=prop(pd.type,name);if(!p)return;
   try{if(pd.type==='color'){const h=v.padStart(6,'0');p.rgb(parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16))}
