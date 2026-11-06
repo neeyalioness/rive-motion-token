@@ -1,4 +1,8 @@
-<title>Rive Motion Tokens</title>
+<!doctype html>
+<html lang="th">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>CML Rive Motion Tokens</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -102,6 +106,11 @@ canvas#rive{display:block;width:200px;height:200px;cursor:pointer;touch-action:n
 .select select::-ms-expand{display:none}
 .select::after{content:"";position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:translateY(-70%) rotate(45deg);pointer-events:none}
 .select:focus-within::after{border-color:var(--ink)}
+.select select:disabled{cursor:default;color:var(--muted);background:var(--sunk);border-color:var(--line)}
+.select:has(select:disabled)::after{opacity:.35}
+.fixval{flex:1;min-width:0;max-width:240px;display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:7px;background:var(--sunk);font:500 13px/1.3 var(--f-body);color:var(--ink);cursor:default;overflow:hidden;white-space:nowrap}
+.fixval small{font:11px var(--f-mono);color:var(--muted)}
+.fixval[hidden],.select[hidden]{display:none}
 .toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
 .toggle input{accent-color:var(--accent);width:16px;height:16px}
 .st-success{color:#1E9E61}.st-error{color:#D93A3A}.st-info{color:#2F7BE0}.st-warning{color:#C27C05}
@@ -300,6 +309,17 @@ td code{white-space:nowrap}
 .tpickers .row>label{min-width:104px}
 .tpickers .tw{font-size:13px;align-items:flex-start;gap:8px}.tpickers .tw input{margin-top:3px;flex:none}.tpickers .tw>span:first-of-type{flex:1;min-width:0}
 .tstage-empty[hidden],.tstatus[hidden]{display:none}
+.tstage{display:flex;align-items:center;justify-content:center;transition:background-color .2s}
+.tstage.sized #riv-canvas{width:var(--cs);height:var(--cs);flex:none;outline:1px dashed color-mix(in srgb,var(--muted) 55%,transparent);outline-offset:2px}
+.tstage.bg-light{--stage-bg:#FFFFFF;--stage-grid:transparent}
+.tstage.bg-dark{--stage-bg:#14161B;--stage-grid:transparent}
+.tbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px 16px;border-top:1px solid var(--line)}
+.tbar .grp{display:flex;align-items:center;gap:6px}
+.tbar .gl{font:11px var(--f-mono);color:var(--muted)}
+.tbar .seg{gap:4px;flex-wrap:nowrap}
+.tbar .seg button,.tbar .btn{padding:4px 9px;font-size:12px;line-height:1.4}
+.tbar .btn:disabled{opacity:.45;cursor:default}
+.tbar .grow{flex:1}
 .csub{padding:10px 0 2px;font:600 11.5px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line)}
 .muted{color:var(--muted);font-size:13px;margin:0}
 .score{font:500 12px var(--f-mono);padding:3px 9px;border-radius:999px;background:var(--sunk);color:var(--muted)}
@@ -674,10 +694,20 @@ td code{white-space:nowrap}
           </div>
           <div class="tstatus" id="tstatus" hidden></div>
         </div>
+        <div class="tbar" id="tbar">
+          <div class="grp"><button class="btn" type="button" id="b-play" disabled>หยุด</button><button class="btn" type="button" id="b-restart" disabled>เริ่มใหม่</button></div>
+          <div class="grp"><span class="gl">ความเร็ว</span><div class="seg" id="seg-speed"><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="0.5">0.5×</button><button type="button" data-v="0.25">0.25×</button></div></div>
+          <div class="grp"><span class="gl">ขนาด</span><div class="seg" id="seg-size"><button type="button" data-v="24">24</button><button type="button" data-v="48">48</button><button type="button" data-v="96">96</button><button type="button" data-v="0" aria-pressed="true">เต็ม</button></div></div>
+          <div class="grp"><span class="gl">พื้น</span><div class="seg" id="seg-bg"><button type="button" data-v="grid" aria-pressed="true">ตาราง</button><button type="button" data-v="light">สว่าง</button><button type="button" data-v="dark">มืด</button></div><span data-tip="<b>ความเร็ว</b> เล่นช้าลงเพื่อดู easing และ transition ระหว่าง state ไม่ได้แก้ค่าในไฟล์<br><br><b>ขนาด</b> แสดงที่ขนาดจริงเป็น px เส้นประคือขอบของ canvas ใช้ดูว่าเส้นบางหรือรายละเอียดเล็กยังอ่านออกไหม<br><br><b>พื้น</b> ใช้ “มืด” คู่กับ <code>surface: inverse</code> ดูว่าสีจมกับพื้นไหม<br><br><b>เริ่มใหม่</b> เปิดไฟล์ใหม่ ค่าที่ปรับไว้จะกลับเป็นค่าในไฟล์"></span></div>
+          <span class="grow"></span>
+          <button class="btn" type="button" id="b-share" hidden>คัดลอกลิงก์</button>
+        </div>
         <div class="tpickers">
           <div class="row"><label for="sel-ab">artboard</label><span class="select"><select id="sel-ab" disabled><option>–</option></select></span></div>
           <div class="row"><label for="sel-sm">state machine</label><span class="select"><select id="sel-sm" disabled><option>–</option></select></span></div>
+          <div class="row" id="row-inst" hidden><label for="sel-inst">instance</label><span class="select" id="inst-pick"><select id="sel-inst"></select></span><span class="fixval" id="inst-fixed" hidden></span></div>
           <label class="toggle tw"><input type="checkbox" id="cb-wrap" checked><span>จำลอง wrapper: เมาส์และคีย์บอร์ดบน canvas เปลี่ยน <code>state</code></span><span data-tip="ทำแบบที่ wrapper ของ dev จะทำ: ชี้ = hover, กดค้าง = pressed, Tab มาที่ canvas = focused, ออก = idle<br><br>ทำงานเมื่อไฟล์มี enum ชื่อ <code>state</code> และมีค่าเหล่านี้"></span></label>
+          <label class="toggle tw"><input type="checkbox" id="cb-rm"><span id="rm-text">จำลอง reduced motion: ตั้ง <code>scheme</code> เป็น <code>reduced</code></span><span data-tip="ทำแบบที่ dev ต้องทำเมื่อผู้ใช้ปิด animation ในเครื่อง (<code>prefers-reduced-motion</code>) คือสลับ <code>scheme</code> เป็น <code>reduced</code><br><br>ถ้าเครื่องที่เปิดหน้านี้ตั้งลด animation ไว้ ช่องนี้จะติ๊กให้ตั้งแต่แรก<br><br>ใช้ได้เมื่อไฟล์มี enum ชื่อ <code>scheme</code> ที่มีค่า <code>reduced</code>"></span></label>
         </div>
       </div>
       <div class="panel group">
@@ -1486,11 +1516,15 @@ const TYPE={enumType:'Enum',number:'Number',integer:'Integer',boolean:'Boolean',
 const $=id=>document.getElementById(id);
 const escH=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cv=$('riv-canvas');
-let RT=null,loading=null,R=null,buf=null,fname='',sel={ab:null,sm:null},vmi=null,seen=new Set(),contents=null,gen=0,lastSet={},ctrlUpd={},mode='none',modeAuto=true,smInputs=[];
+let RT=null,loading=null,R=null,buf=null,fname='',sel={ab:null,sm:null},vmi=null,seen=new Set(),contents=null,gen=0,lastSet={},ctrlUpd={},mode='none',modeAuto=true,smInputs=[],VM=null,assets=[],SPEED=1,SIZE=0,BG='grid',PENDING=null,fromSample=null,rmPrev=null;
+const FRAMED=(()=>{try{return window.top!==window}catch(e){return true}})();
 
 function loadRuntime(){if(RT)return Promise.resolve(RT);if(loading)return loading;
  loading=new Promise((res,rej)=>{const s=document.createElement('script');s.src=`https://cdn.jsdelivr.net/npm/@rive-app/canvas@${RIVE_VER}/rive.js`;
-  s.onload=async()=>{RT=window.rive;try{RT.Rive.suppressDeprecationWarnings=['default-state-machine','rive-events']}catch(e){}
+  s.onload=async()=>{RT=window.rive;
+   /* slow motion: feed Rive a virtual clock that runs at SPEED */
+   try{const od=RT.Rive.prototype.draw;RT.Rive.prototype.draw=function(time,onSec){if(this.__rt==null||!this.lastRenderTime){this.__vt=time;this.__rt=time}else{this.__vt+=(time-this.__rt)*SPEED;this.__rt=time}return od.call(this,this.__vt,onSec)}}catch(e){}
+   try{RT.Rive.suppressDeprecationWarnings=['default-state-machine','rive-events']}catch(e){}
    /* use the local rive.wasm when it is deployed next to the page, otherwise the CDN copy */
    let w=new URL('rive.wasm',location.href).href;try{const h=await fetch(w,{method:'HEAD'});if(!h.ok)throw 0}catch(e){w=`https://cdn.jsdelivr.net/npm/@rive-app/canvas@${RIVE_VER}/rive.wasm`}
    try{RT.RuntimeLoader.setWasmUrl(w)}catch(e){}res(RT)};
@@ -1506,7 +1540,7 @@ $('b-clear').onclick=()=>{$('log').innerHTML='<li class="muted">ยังไม�
 
 /* ---------- open file ---------- */
 function openFile(file){if(!file)return;if(!/\.riv$/i.test(file.name)){status('bad',`“${file.name}” ไม่ใช่ไฟล์ .riv เลือกไฟล์ที่ export จาก Rive Editor`);return}
- const fr=new FileReader();fr.onload=()=>openBuffer(fr.result,file.name,file.size);fr.onerror=()=>status('bad','อ่านไฟล์ไม่ได้ ลองเลือกใหม่อีกครั้ง');fr.readAsArrayBuffer(file)}
+ const fr=new FileReader();fr.onload=()=>{fromSample=null;openBuffer(fr.result,file.name,file.size)};fr.onerror=()=>status('bad','อ่านไฟล์ไม่ได้ ลองเลือกใหม่อีกครั้ง');fr.readAsArrayBuffer(file)}
 function openBuffer(ab,name,size){buf=ab;fname=name;sel={ab:null,sm:null};seen=new Set();
  $('drop-title').textContent=name;$('drop-sub').textContent=`${(size/1024).toFixed(0)} KB · คลิกหรือลากไฟล์ใหม่มาวางเพื่อเปลี่ยน`;
  $('drop').classList.add('has');log('sys',`เปิด ${name}`);start()}
@@ -1524,7 +1558,7 @@ async function sampleBytes(k){if(sampleCache[k])return sampleCache[k];
  const r=await fetch(SAMPLES[k].src);if(!r.ok)throw new Error('fetch');
  const bin=atob((await r.text()).trim()),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return sampleCache[k]=u8}
 async function openSample(k){status('wait','กำลังโหลดไฟล์ตัวอย่าง…');
- try{const u8=await sampleBytes(k);const ab=u8.slice().buffer;openBuffer(ab,SAMPLES[k].file,ab.byteLength)}
+ try{const u8=await sampleBytes(k);const ab=u8.slice().buffer;fromSample=k;openBuffer(ab,SAMPLES[k].file,ab.byteLength)}
  catch(e){status('bad','โหลดไฟล์ตัวอย่างไม่ได้ ลองลากไฟล์ .riv ของคุณเองมาวางแทน')}}
 /* minimal zip (store) so a .riv can be saved through the downloads capability */
 const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
@@ -1558,9 +1592,10 @@ document.querySelectorAll('[data-sample-open]').forEach(b=>b.onclick=()=>openSam
 async function start(){const my=++gen;status('wait','กำลังเปิดไฟล์ด้วย Rive runtime…');$('tstage-empty').hidden=true;
  let rt;try{rt=await loadRuntime()}catch(e){status('bad','โหลด Rive runtime ไม่ได้ ตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่');return}
  if(my!==gen)return;
- if(R){try{R.cleanup()}catch(e){}R=null}vmi=null;
+ if(R){try{R.cleanup()}catch(e){}R=null}vmi=null;assets=[];updPlay();
  const opts={buffer:buf.slice(0),canvas:cv,autoplay:true,autoBind:true,
   layout:new rt.Layout({fit:rt.Fit.Contain,alignment:rt.Alignment.Center}),
+  assetLoader:(a,bytes)=>{if(my===gen)try{assets.push({name:a.name||a.uniqueFilename||'ไม่มีชื่อ',ext:a.fileExtension||'',kind:a.isFont?'font':a.isImage?'รูป':a.isAudio?'เสียง':'asset',embedded:!!(bytes&&bytes.length),cdn:!!a.cdnUuid})}catch(e){}return false},
   onLoad:()=>{if(my===gen)loaded(rt,my)},
   onLoadError:()=>{if(my===gen){status('bad','เปิดไฟล์ไม่ได้ ไฟล์อาจเสีย หรือ export จาก Rive Editor เวอร์ชันที่ใหม่กว่า runtime '+RIVE_VER);render(null)}}};
  if(sel.ab)opts.artboard=sel.ab;if(sel.sm)opts.stateMachine=sel.sm;
@@ -1570,21 +1605,48 @@ function loaded(rt,my){contents=R.contents||{artboards:[]};const abs=contents.ar
   if(!ab){status('bad','ไฟล์นี้ไม่มี artboard');return}
   const sm=ab.stateMachines.find(s=>s.name===CONTRACT.stateMachine)||ab.stateMachines[0];
   sel={ab:ab.name,sm:sm?sm.name:null};start();return}
+ if(PENDING&&!PENDING.started&&(PENDING.file===fname||(SAMPLES[PENDING.file]&&SAMPLES[PENDING.file].file===fname))){PENDING.started=true;
+  const ab=abs.find(a=>a.name===PENDING.ab)||abs.find(a=>a.name===sel.ab);const smOk=ab&&ab.stateMachines.some(x=>x.name===PENDING.sm);
+  const want={ab:ab.name,sm:smOk?PENDING.sm:(ab.stateMachines[0]||{}).name||null,inst:PENDING.inst||null};
+  if(want.ab!==sel.ab||want.sm!==sel.sm||want.inst!==(sel.inst||null)){sel=want;start();return}}
  try{R.resizeDrawingSurfaceToCanvas()}catch(e){}
  vmi=R.viewModelInstance||null;
+ VM=null;try{VM=vmi?R.viewModelByName(vmi.viewModelName):null}catch(e){VM=null}
+ defName=findDefName();if(sel.inst&&sel.inst===defName)sel.inst=null;
+ if(VM&&sel.inst){const inst=pickInst(sel.inst);if(inst){try{R.bindViewModelInstance(inst);vmi=R.viewModelInstance||inst}catch(e){sel.inst=null}}else sel.inst=null}
  try{smInputs=sel.sm?(R.stateMachineInputs(sel.sm)||[]):[]}catch(e){smInputs=[]}
  if(modeAuto){let vmNames=[];try{for(let i=0;i<R.viewModelCount;i++){const v=R.viewModelByIndex(i);if(v)vmNames.push(v.name)}}catch(e){}
   const looksSpinner=(contents.artboards||[]).some(a=>a.name===CONTRACT.artboard)||vmNames.includes(CONTRACT.viewModel);
   setMode('none',false);$('cmode-note').hidden=!looksSpinner;if(looksSpinner)$('cmode-note').textContent='ไฟล์นี้มีโครงแบบ spinner เลือก “Spinner contract v1” ด้านบนเพื่อตรวจว่าพร้อมส่ง dev'}
  R.on(rt.EventType.RiveEvent,e=>{const n=e.data&&e.data.name;if(!n)return;log('ev',n);if(!seen.has(n)){seen.add(n);renderChecks()}});
- status(null);fillPickers();render(rt);
- log('sys',`artboard “${sel.ab}” · state machine “${sel.sm||'ไม่มี'}” · View model “${vmi?vmi.viewModelName:'ไม่ได้ผูก'}”`)}
+ status(null);fillPickers();render(rt);updPlay();$('b-share').hidden=FRAMED;applyStage();applyPending();
+ log('sys',`artboard “${sel.ab}” · state machine “${sel.sm||'ไม่มี'}” · View model “${vmi?vmi.viewModelName:'ไม่ได้ผูก'}”${vmi?` · instance “${instLabel()}”`:''}`)}
+/* ---------- View model instances ---------- */
+function instNames(){try{return VM?(VM.instanceNames||[]).filter(n=>n!==''):[]}catch(e){return[]}}
+function pickInst(k){if(!VM)return null;try{return VM.instanceByName(k)}catch(e){return null}}
+/* which named instance is the file's default? the runtime has no name for it, so match by values */
+let defName=null;
+function instSig(inst){if(!inst)return'';const m={enumType:'enum',number:'number',integer:'number',boolean:'boolean',color:'color',string:'string'};
+ try{return inst.properties.map(pd=>{const f=m[pd.type];if(!f)return'';try{return pd.name+'='+inst[f](pd.name).value}catch(e){return''}}).join('|')}catch(e){return''}}
+function findDefName(){const names=instNames();if(!VM||!names.length)return null;if(names.length===1)return names[0];
+ let d='';try{d=instSig(VM.defaultInstance())}catch(e){}return names.find(n=>instSig(pickInst(n))===d)||names[0]}
+function instLabel(){return sel.inst||defName||'ค่าเริ่มต้น'}
+$('sel-inst').onchange=e=>{let k=e.target.value||null;if(k===defName)k=null;let inst=null;
+ try{inst=k?pickInst(k):VM.defaultInstance()}catch(err){inst=null}
+ if(!inst){log('sys','เปลี่ยน instance ไม่ได้');return}
+ try{R.bindViewModelInstance(inst)}catch(err){log('sys','ผูก instance ไม่ได้: '+err.message);return}
+ sel.inst=k;vmi=R.viewModelInstance||inst;lastSet={};render(RT);log('sys',`ผูก instance “${instLabel()}”`)};
 window.addEventListener('resize',()=>{if(R)try{R.resizeDrawingSurfaceToCanvas()}catch(e){}});
 
 function fillPickers(){const abs=contents.artboards||[],sa=$('sel-ab'),ss=$('sel-sm');
  sa.innerHTML=abs.map(a=>`<option${a.name===sel.ab?' selected':''}>${escH(a.name)}</option>`).join('');sa.disabled=false;
  const ab=abs.find(a=>a.name===sel.ab)||{stateMachines:[]};
- ss.innerHTML=ab.stateMachines.length?ab.stateMachines.map(s=>`<option${s.name===sel.sm?' selected':''}>${escH(s.name)}</option>`).join(''):'<option>ไม่มี state machine</option>';ss.disabled=!ab.stateMachines.length}
+ ss.innerHTML=ab.stateMachines.length?ab.stateMachines.map(s=>`<option${s.name===sel.sm?' selected':''}>${escH(s.name)}</option>`).join(''):'<option>ไม่มี state machine</option>';ss.disabled=!ab.stateMachines.length;
+ const ri=$('row-inst'),si=$('sel-inst'),names=instNames();ri.hidden=!VM;
+ if(VM){const cur=sel.inst||defName;
+  si.innerHTML=names.length?names.map(n=>`<option value="${escH(n)}"${n===cur?' selected':''}>${escH(n)}</option>`).join(''):'<option>ค่าเริ่มต้น (ไม่ได้ตั้งชื่อ)</option>';
+  const one=names.length<2;$('inst-pick').hidden=one;const fx=$('inst-fixed');fx.hidden=!one;
+  if(one)fx.textContent=names[0]||'ค่าเริ่มต้น'}}
 $('sel-ab').onchange=e=>{const ab=(contents.artboards||[]).find(a=>a.name===e.target.value);sel={ab:e.target.value,sm:ab&&ab.stateMachines[0]?ab.stateMachines[0].name:null};start()};
 $('sel-sm').onchange=e=>{sel.sm=e.target.value;start()};
 
@@ -1601,9 +1663,12 @@ function checkGeneral(){const out=[],add=(st,label,detail)=>out.push({st,label,d
  else add('warn',`artboard “${sel.ab}” ไม่มี state machine`,'เล่นได้แค่ timeline ตรง ๆ และ data binding จะไม่ทำงาน ควรเพิ่ม state machine');
  const props=vmi?flat().filter(p=>p.type!=='viewModel'):[];
  if(vmi)add('ok',`View model “${vmi.viewModelName}” · ${props.length} property`,props.map(p=>`${p.name} (${TYPE[p.type]||p.type})`).join(', ')||'ไม่มี property');
+ if(VM){const names=instNames();add(names.length?'ok':'info',`instance ของ “${VM.name}” ${names.length} อัน`,names.length?`${names.join(', ')} · ค่าเริ่มต้นคือ “${defName}”${names.length>1?' สลับได้ที่ช่อง instance ใต้ preview':''}`:'ไม่มี instance ที่ตั้งชื่อไว้ runtime จะสร้างค่าเริ่มต้นให้')}
  if(smInputs.length)add('warn',`inputs แบบเก่า ${smInputs.length} ตัว`,smInputs.map(i=>i.name).join(', ')+' · ยังใช้ได้ แต่ Rive deprecate แล้ว ควรย้ายไปเป็น View model');
  if(!vmi&&!smInputs.length)add(ab.stateMachines.length?'info':'warn','ไม่มีอะไรให้ code ควบคุม',ab.stateMachines.length?'ไม่มีทั้ง View model และ inputs ไฟล์นี้จะทำงานเองจาก listener หรือ timeline ภายในไฟล์เท่านั้น':'ไม่มีทั้ง state machine, View model และ inputs');
  else add('ok','ควบคุมจาก code ได้',vmi&&smInputs.length?'ผ่าน View model และ inputs':vmi?'ผ่าน View model (data binding)':'ผ่าน inputs แบบเก่าเท่านั้น');
+ if(vmi&&!rmProp())add('info','ไม่มีโหมด reduced motion','ถ้าผู้ใช้ปิด animation ในเครื่อง dev จะไม่มีค่าให้สลับ ทางเลือกคือเพิ่ม enum scheme ที่มีค่า reduced หรือให้ dev หยุดไฟล์ไว้ที่เฟรมนิ่งแทน');
+ addAssets(add);
  if(seen.size)add('info','สัญญาณที่ไฟล์ส่งกลับมาระหว่างทดสอบ',[...seen].join(', '));
  return out}
 const near=(list,n)=>list.find(x=>x.toLowerCase()===n.toLowerCase());
@@ -1638,6 +1703,7 @@ function check(){if(mode==='none')return checkGeneral();const out=[],add=(st,lab
    else add('ok',label,vals.join(' | '))}
   else add('ok',label,'')});
  if(vmi&&props.some(x=>x.name==='exitDone'&&x.type==='trigger'))add(seen.has('exitDone')?'ok':'wait','ไฟล์ยิง exitDone กลับมาจริง',seen.has('exitDone')?'ได้รับระหว่างทดสอบ':'ตรวจจากไฟล์อย่างเดียวไม่ได้ กดปุ่ม “ยิง exit” แล้วรอให้ exitDone ขึ้นใน Log แบบ Rive → code');
+ addAssets(add);
  return out}
 function renderChecks(){const list=check(),ic={ok:'✓',bad:'✕',warn:'!',wait:'…',info:'i'};
  const li=c=>`<li class="ck ${c.st}"><span class="ck-ic" aria-label="${c.st}">${ic[c.st]}</span><span class="ck-b"><b>${escH(c.label)}</b>${c.detail?`<span>${escH(c.detail)}</span>`:''}</span></li>`;
@@ -1693,7 +1759,7 @@ function renderControls(){const box=$('controls');ctrlUpd={};box.innerHTML='';
    if(ls&&now-ls.t<250&&(pd.type==='trigger'||ls.v===''||ls.v===String(p.value)))return;
    if(pd.type==='trigger'&&!seen.has(pd.name)){seen.add(pd.name);setTimeout(renderChecks,0)}
    log('in',pd.type==='trigger'?`${pd.name} (trigger)`:`${pd.name} = ${pd.type==='color'?hex6(p.value):p.value}`)})}catch(e){}});
- renderInputs(box);wireWrapper()}
+ renderInputs(box);wireWrapper();updRM()}
 function renderInputs(box){if(!smInputs.length)return;const T=RT.StateMachineInputType;
  const h=document.createElement('div');h.className='csub';h.textContent=`inputs แบบเก่า · ${sel.sm}`;box.appendChild(h);
  smInputs.forEach(inp=>{const row=document.createElement('div');row.className='crow';
@@ -1751,10 +1817,17 @@ ${k('const')} r = ${k('new')} Rive({
   artboard: ${s(JSON.stringify(sel.ab||''))},
   stateMachine: ${s(JSON.stringify(sel.sm||''))},
   autoplay: ${k('true')},
-  autoBind: ${k('true')},
+${assets.some(a=>!a.embedded&&!a.cdn)?`  assetLoader: (asset, bytes) => {   ${c('// asset ที่ไม่ได้ฝังในไฟล์')}
+    ${k('if')} (bytes.length) ${k('return false')};
+    ${c('// โหลดไฟล์ของ asset.name เอง แล้วเรียก asset.decode(new Uint8Array(buffer))')}
+    ${k('return true')};
+  },
+`:''}  autoBind: ${k(vmi&&sel.inst?'false':'true')},
   onLoad: () => {
     r.resizeDrawingSurfaceToCanvas();
-${vmi?`    ${k('const')} vm = r.viewModelInstance;   ${c('// '+vmi.viewModelName)}
+${vmi&&sel.inst?`    ${k('const')} vm = r.viewModelByName(${s(JSON.stringify(vmi.viewModelName))}).instanceByName(${s(JSON.stringify(sel.inst))});
+    r.bindViewModelInstance(vm);
+${lines.join('\n')||c('    // View model นี้ไม่มี property')}`:vmi?`    ${k('const')} vm = r.viewModelInstance;   ${c('// '+vmi.viewModelName)}
 ${lines.join('\n')||c('    // View model นี้ไม่มี property')}`:c('    // ไฟล์นี้ไม่มี View model ที่ผูกกับ artboard')}
   },
 });
@@ -1768,6 +1841,63 @@ r.viewModelInstance.trigger(${s('"exitDone"')}).on(() => unmount());`:`${c('// �
 $('b-copy').onclick=async()=>{const t=$('t-code').innerText,b=$('b-copy');
  try{await navigator.clipboard.writeText(t);b.textContent='คัดลอกแล้ว'}catch(e){const r=document.createRange();r.selectNodeContents($('t-code'));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='เลือกข้อความแล้ว กด Ctrl+C'}
  setTimeout(()=>b.textContent='คัดลอก',1800)};
+/* ---------- preview toolbar ---------- */
+function segSet(id,v){$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===String(v)))}
+function applyStage(){const st=$('tstage');st.classList.toggle('sized',SIZE>0);st.style.setProperty('--cs',SIZE+'px');
+ st.classList.remove('bg-light','bg-dark');if(BG!=='grid')st.classList.add('bg-'+BG);segSet('seg-size',SIZE);segSet('seg-bg',BG);segSet('seg-speed',SPEED);
+ if(R)requestAnimationFrame(()=>{try{R.resizeDrawingSurfaceToCanvas()}catch(e){}})}
+const segPick=(id,fn)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(b){fn(b.dataset.v);applyStage()}});
+segPick('seg-speed',v=>{SPEED=+v;log('sys',`ความเร็ว ${v}×`)});
+segPick('seg-size',v=>{SIZE=+v;log('sys',SIZE?`ขนาด ${SIZE}px`:'ขนาดเต็มกล่อง')});
+segPick('seg-bg',v=>{BG=v});
+function updPlay(){const b=$('b-play'),ok=!!(R&&contents);b.disabled=!ok;$('b-restart').disabled=!buf;b.textContent=ok&&!R.isPlaying?'เล่นต่อ':'หยุด'}
+$('b-play').onclick=()=>{if(!R)return;try{if(R.isPlaying){R.pause();log('sys','หยุด')}else{R.play();log('sys','เล่นต่อ')}}catch(e){}updPlay()};
+$('b-restart').onclick=()=>{if(buf){log('sys','เริ่มใหม่');start()}};
+
+/* ---------- reduced motion ---------- */
+function rmProp(){const p=vmi?prop('enumType','scheme'):null;return p&&p.values&&p.values.includes('reduced')?p:null}
+function updRM(){const p=rmProp(),cb=$('cb-rm');cb.disabled=!p;
+ $('rm-text').innerHTML=p?'จำลอง reduced motion: ตั้ง <code>scheme</code> เป็น <code>reduced</code>':vmi?'จำลอง reduced motion: ไฟล์นี้ไม่มี <code>scheme</code> ที่มีค่า <code>reduced</code>':'จำลอง reduced motion: เปิดไฟล์ที่มี View model ก่อน';
+ if(cb.checked&&p&&p.value!=='reduced'){rmPrev=p.value;setVal(p,'scheme','reduced')}}
+$('cb-rm').checked=matchMedia('(prefers-reduced-motion: reduce)').matches;
+$('cb-rm').onchange=e=>{const p=rmProp();if(!p)return;
+ if(e.target.checked){rmPrev=p.value;setVal(p,'scheme','reduced')}
+ else{const v=rmPrev&&rmPrev!=='reduced'?rmPrev:p.values.find(x=>x!=='reduced');if(v)setVal(p,'scheme',v);rmPrev=null}};
+
+/* ---------- assets ---------- */
+function addAssets(add){if(!assets.length)return;
+ const nm=l=>l.map(a=>`${a.name}${a.ext&&!a.name.endsWith('.'+a.ext)?'.'+a.ext:''} (${a.kind})`).join(', ');
+ const emb=assets.filter(a=>a.embedded),cdn=assets.filter(a=>!a.embedded&&a.cdn),ref=assets.filter(a=>!a.embedded&&!a.cdn);
+ if(ref.length)add('bad',`asset ไม่ได้อยู่ในไฟล์ ${ref.length} อัน`,`${nm(ref)} · ตั้งเป็น Referenced ไว้ บนเว็บจะไม่ขึ้นจนกว่า dev จะโหลดเองผ่าน assetLoader ถ้าไม่ได้ตั้งใจ ให้เปลี่ยนเป็น Embedded ใน Rive Editor แล้ว export ใหม่`);
+ if(cdn.length)add('warn',`asset โหลดจาก Rive CDN ${cdn.length} อัน`,`${nm(cdn)} · ต้องต่ออินเทอร์เน็ตตอนเปิด และขึ้นช้ากว่าแบบฝังในไฟล์ ถ้าใช้ในแอปที่ต้องทำงาน offline ให้เปลี่ยนเป็น Embedded`);
+ if(emb.length)add('ok',`asset ฝังในไฟล์ ${emb.length} อัน`,nm(emb))}
+
+/* ---------- share link ---------- */
+function shareURL(){const q=new URLSearchParams();q.set('f',fromSample||fname);if(sel.ab)q.set('ab',sel.ab);if(sel.sm)q.set('sm',sel.sm);if(sel.inst)q.set('inst',sel.inst);
+ if(SPEED!==1)q.set('speed',SPEED);if(SIZE)q.set('size',SIZE);if(BG!=='grid')q.set('bg',BG);const rm=$('cb-rm').checked&&!!rmProp();if(rm)q.set('rm','1');
+ if(vmi)flat().forEach(pd=>{if(pd.type==='trigger'||pd.type==='viewModel')return;const p=prop(pd.type,pd.name);if(!p)return;let v=p.value;
+  if(pd.type==='color')v=hex6(v).slice(1);else if(pd.type==='number'||pd.type==='integer')v=Math.round(v*1000)/1000;else if(rm&&pd.name==='scheme'&&rmPrev)v=rmPrev;
+  q.set('v.'+pd.name,String(v))});
+ return location.origin+location.pathname+'?'+q.toString()+'#tester'}
+$('b-share').onclick=async()=>{const u=shareURL(),b=$('b-share');try{history.replaceState(null,'',u)}catch(e){}
+ try{await navigator.clipboard.writeText(u);b.textContent='คัดลอกแล้ว'}catch(e){b.textContent='ลิงก์อยู่ในแถบที่อยู่แล้ว'}
+ log('sys','สร้างลิงก์สถานะนี้');setTimeout(()=>b.textContent='คัดลอกลิงก์',2200)};
+function applyPending(){if(!PENDING||!PENDING.started)return;const P=PENDING;PENDING=null;let n=0;
+ if(vmi){const fl=flat();Object.entries(P.vals).forEach(([name,v])=>{const pd=fl.find(x=>x.name===name);if(!pd)return;const p=prop(pd.type,name);if(!p)return;
+  try{if(pd.type==='color'){const h=v.padStart(6,'0');p.rgb(parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16))}
+   else if(pd.type==='number'||pd.type==='integer')p.value=+v;else if(pd.type==='boolean')p.value=v==='true';
+   else if(pd.type==='enumType'){if(!p.values.includes(v))return;p.value=v}else p.value=v;
+   lastSet[name]={v:'',t:performance.now()};n++}catch(e){}})}
+ if(P.rm)$('cb-rm').checked=true;rmPrev=null;updRM();Object.values(ctrlUpd).forEach(f=>{try{f()}catch(e){}});renderCode();
+ log('sys',`ตั้งค่าตามลิงก์แล้ว ${n} ค่า`)}
+(function readLink(){let q;try{q=new URLSearchParams(location.search)}catch(e){return}if(!q.has('f'))return;
+ PENDING={file:q.get('f'),ab:q.get('ab'),sm:q.get('sm'),inst:q.get('inst'),rm:q.get('rm')==='1',vals:{}};
+ q.forEach((v,k)=>{if(k.startsWith('v.'))PENDING.vals[k.slice(2)]=v});
+ if(q.has('speed'))SPEED=[1,0.5,0.25].includes(+q.get('speed'))?+q.get('speed'):1;if(q.has('size'))SIZE=[0,24,48,96].includes(+q.get('size'))?+q.get('size'):0;
+ if(['grid','light','dark'].includes(q.get('bg')))BG=q.get('bg');applyStage();if(PENDING.rm)$('cb-rm').checked=true;
+ $('t-test').click();loadRuntime().catch(()=>{});
+ if(SAMPLES[PENDING.file])openSample(PENDING.file);
+ else{$('drop-title').textContent=`ลากไฟล์ ${PENDING.file} มาวางที่นี่`;$('drop-sub').textContent='ลิงก์นี้ตั้งค่าไว้สำหรับไฟล์นี้ เปิดไฟล์แล้วค่าจะตั้งให้ตามลิงก์'}})();
 renderChecks();
 document.querySelector('[data-tab="test"]').addEventListener('click',()=>{loadRuntime().catch(()=>{})},{once:true});
 })();
