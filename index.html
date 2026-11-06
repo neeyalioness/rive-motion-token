@@ -109,6 +109,7 @@ canvas#rive{display:block;width:200px;height:200px;cursor:pointer;touch-action:n
 .select select:disabled{cursor:default;color:var(--muted);background:var(--sunk);border-color:var(--line)}
 .select:has(select:disabled)::after{opacity:.35}
 .fixval{flex:1;min-width:0;max-width:240px;display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:7px;background:var(--sunk);font:500 13px/1.3 var(--f-body);color:var(--ink);cursor:default;overflow:hidden;white-space:nowrap}
+.cv .fpick{display:inline-flex;align-items:center;cursor:pointer}.cv .fname{font-size:12px;margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .fixval small{font:11px var(--f-mono);color:var(--muted)}
 .fixval[hidden],.select[hidden]{display:none}
 .toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
@@ -1526,7 +1527,7 @@ const CONTRACT={name:'Spinner contract v1',artboard:'Spinner',stateMachine:'SM_M
   {name:'surface',type:'enumType',values:['default','inverse']},
   {name:'scheme',type:'enumType',values:['professional','natural','playful','reduced']},
   {name:'color',type:'color'},{name:'size',type:'number'},{name:'stroke',type:'number'},{name:'speed',type:'number'},{name:'exit',type:'trigger'},{name:'exitDone',type:'trigger',back:true}]};
-const TYPE={enumType:'Enum',number:'Number',integer:'Integer',boolean:'Boolean',color:'Color',string:'String',trigger:'Trigger',list:'List',viewModel:'View model',image:'Image',artboard:'Artboard'};
+const TYPE={enumType:'Enum',number:'Number',integer:'Integer',boolean:'Boolean',color:'Color',string:'String',trigger:'Trigger',list:'List',viewModel:'View model',image:'Image',font:'Font',artboard:'Artboard'};
 const $=id=>document.getElementById(id);
 const escH=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cv=$('riv-canvas');
@@ -1736,7 +1737,7 @@ const hex6=v=>'#'+((v>>>0)&0xFFFFFF).toString(16).padStart(6,'0');
 function render(rt){renderChecks();renderInfo();renderCode();renderControls()}
 function flat(){const out=[];const walk=(inst,pre,d)=>{(inst?inst.properties:[]).forEach(pd=>{const path=pre+pd.name;out.push({...pd,name:path});
   if(pd.type==='viewModel'&&d<3){let ch=null;try{ch=vmi.viewModel(path)}catch(e){}if(ch)walk(ch,path+'/',d+1)}})};walk(vmi,'',0);return out}
-function prop(type,name){try{return{enumType:vmi.enum,number:vmi.number,integer:vmi.number,boolean:vmi.boolean,color:vmi.color,string:vmi.string,trigger:vmi.trigger}[type].call(vmi,name)}catch(e){return null}}
+function prop(type,name){try{return{enumType:vmi.enum,number:vmi.number,integer:vmi.number,boolean:vmi.boolean,color:vmi.color,string:vmi.string,trigger:vmi.trigger,image:vmi.image,font:vmi.font,artboard:vmi.artboard}[type].call(vmi,name)}catch(e){return null}}
 function setVal(p,name,v,shown){lastSet[name]={v:String(v),t:performance.now()};p.value=v;log('out',`${name} = ${shown??v}`)}
 function renderControls(){const box=$('controls');ctrlUpd={};box.innerHTML='';
  $('vm-name').textContent=vmi?vmi.viewModelName:(smInputs.length?`inputs ${smInputs.length} ตัว`:'ไม่มี View model');
@@ -1762,14 +1763,24 @@ function renderControls(){const box=$('controls');ctrlUpd={};box.innerHTML='';
    const c=cvx.querySelector('input'),s=cvx.querySelector('span');c.onchange=()=>setVal(p,pd.name,c.checked);ctrlUpd[pd.name]=()=>{c.checked=!!p.value;s.textContent=String(!!p.value)}}
   else if(pd.type==='color'){cvx.innerHTML=`<input type="color" id="${id}" aria-label="${escH(pd.name)}"><code class="cval"></code>`;
    const c=cvx.querySelector('input'),k=cvx.querySelector('code');
-   c.oninput=()=>{const h=c.value;lastSet[pd.name]={v:'',t:performance.now()};p.rgb(parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16));log('out',`${pd.name} = ${h}`)};
-   ctrlUpd[pd.name]=()=>{const h=hex6(p.value);if(document.activeElement!==c)c.value=h;k.textContent=h}}
+   c.oninput=()=>{const h=c.value,a=(p.value>>>24)&255;lastSet[pd.name]={v:'',t:performance.now()};try{p.argb(a,parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16))}catch(e){p.rgb(parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16))}log('out',`${pd.name} = ${h}`)};
+   ctrlUpd[pd.name]=()=>{const h=hex6(p.value),a=(p.value>>>24)&255;if(document.activeElement!==c)c.value=h;k.textContent=h+(a<255?` · ทึบ ${Math.round(a/255*100)}%`:'')}}
   else if(pd.type==='string'){cvx.innerHTML=`<input type="text" id="${id}" class="txt" aria-label="${escH(pd.name)}">`;
    const t=cvx.querySelector('input');t.onchange=()=>setVal(p,pd.name,t.value);ctrlUpd[pd.name]=()=>{if(document.activeElement!==t)t.value=p.value}}
+  else if(pd.type==='image'||pd.type==='font'){const isImg=pd.type==='image';
+   cvx.innerHTML=`<label class="btn fpick">${isImg?'เลือกรูป':'เลือก font'}<input type="file" accept="${isImg?'image/png,image/jpeg,image/webp':'.ttf,.otf,.woff,.woff2'}" hidden></label><button type="button" class="btn">ล้าง</button><span class="muted fname">ค่าจากไฟล์</span>`;
+   const inp=cvx.querySelector('input'),nm=cvx.querySelector('.fname');
+   inp.onchange=async()=>{const f=inp.files[0];inp.value='';if(!f)return;
+    try{const bytes=new Uint8Array(await f.arrayBuffer());const a=await (isImg?RT.decodeImage(bytes):RT.decodeFont(bytes));p.value=a;try{a.unref&&a.unref()}catch(e){}nm.textContent=f.name;log('out',`${pd.name} = ${f.name}`)}
+    catch(e){nm.textContent=isImg?'อ่านรูปนี้ไม่ได้':'อ่าน font นี้ไม่ได้'}};
+   cvx.querySelector('button').onclick=()=>{try{p.value=null;nm.textContent='ว่าง';log('out',`${pd.name} = ว่าง`)}catch(e){}}}
+  else if(pd.type==='artboard'){const abs=(contents.artboards||[]).map(a=>a.name);
+   cvx.innerHTML=`<span class="select"><select aria-label="${escH(pd.name)}"><option value="">ค่าจากไฟล์</option>${abs.map(n=>`<option>${escH(n)}</option>`).join('')}</select></span>`;
+   const se=cvx.querySelector('select');se.onchange=()=>{if(!se.value)return;try{const ab=R.getBindableArtboard(se.value);p.value=ab;log('out',`${pd.name} = artboard “${se.value}”`)}catch(e){log('sys','ใส่ artboard นี้ไม่ได้')}}}
   else if(pd.type==='trigger'){cvx.innerHTML=`<button type="button" class="btn">ยิง ${escH(pd.name)}</button>`;
    cvx.querySelector('button').onclick=()=>{lastSet[pd.name]={v:'trig',t:performance.now()};p.trigger();log('out',`${pd.name} (trigger)`)}}
   if(ctrlUpd[pd.name])ctrlUpd[pd.name]();
-  try{p.on(()=>{if(ctrlUpd[pd.name])ctrlUpd[pd.name]();const ls=lastSet[pd.name],now=performance.now();
+  try{p.on(()=>{if(ctrlUpd[pd.name])ctrlUpd[pd.name]();if(['image','font','artboard','list'].includes(pd.type))return;const ls=lastSet[pd.name],now=performance.now();
    if(ls&&now-ls.t<250&&(pd.type==='trigger'||ls.v===''||ls.v===String(p.value)))return;
    if(pd.type==='trigger'&&!seen.has(pd.name)){seen.add(pd.name);setTimeout(renderChecks,0)}
    log('in',pd.type==='trigger'?`${pd.name} (trigger)`:`${pd.name} = ${pd.type==='color'?hex6(p.value):p.value}`)})}catch(e){}});
@@ -1819,7 +1830,10 @@ function renderCode(){const el=$('t-code');if(!contents){return}
   if(pd.type==='enumType')lines.push(`    vm.enum(${s(n)}).value = ${s(JSON.stringify(p.values[0]||''))};   ${c('// '+p.values.join(' | '))}`);
   else if(pd.type==='number'||pd.type==='integer')lines.push(`    vm.number(${s(n)}).value = ${s(String(Math.round(p.value*100)/100))};`);
   else if(pd.type==='boolean')lines.push(`    vm.boolean(${s(n)}).value = ${k('true')};`);
-  else if(pd.type==='color')lines.push(`    vm.color(${s(n)}).value = ${s('0xFF'+hex6(p.value).slice(1).toUpperCase())};   ${c('// ARGB')}`);
+  else if(pd.type==='color')lines.push(`    vm.color(${s(n)}).value = ${s('0x'+(((p.value>>>24)&255).toString(16).padStart(2,'0')+hex6(p.value).slice(1)).toUpperCase())};   ${c('// ARGB')}`);
+  else if(pd.type==='image')lines.push(`    vm.image(${s(n)}).value = ${k('await')} decodeImage(bytes);   ${c('// แล้วเรียก .unref() ที่รูป')}`);
+  else if(pd.type==='font')lines.push(`    vm.font(${s(n)}).value = ${k('await')} decodeFont(bytes);`);
+  else if(pd.type==='artboard')lines.push(`    vm.artboard(${s(n)}).value = r.getBindableArtboard(${s('"ชื่อ artboard"')});`);
   else if(pd.type==='string')lines.push(`    vm.string(${s(n)}).value = ${s('"…"')};`);
   else if(pd.type==='trigger')lines.push(`    vm.trigger(${s(n)}).trigger();`)});
  el.innerHTML=
@@ -1890,8 +1904,8 @@ function addAssets(add){if(!assets.length)return;
 /* ---------- share link ---------- */
 function shareURL(){const q=new URLSearchParams();q.set('f',fromSample||fname);if(sel.ab)q.set('ab',sel.ab);if(sel.sm)q.set('sm',sel.sm);if(sel.inst)q.set('inst',sel.inst);
  if(SPEED!==1)q.set('speed',SPEED);if(SIZE)q.set('size',SIZE);if(BG!=='grid')q.set('bg',BG);const rm=$('cb-rm').checked&&!!rmProp();if(rm)q.set('rm','1');
- if(vmi)flat().forEach(pd=>{if(pd.type==='trigger'||pd.type==='viewModel')return;const p=prop(pd.type,pd.name);if(!p)return;let v=p.value;
-  if(pd.type==='color')v=hex6(v).slice(1);else if(pd.type==='number'||pd.type==='integer')v=Math.round(v*1000)/1000;else if(rm&&pd.name==='scheme'&&rmPrev)v=rmPrev;
+ if(vmi)flat().forEach(pd=>{if(!['enumType','number','integer','boolean','color','string'].includes(pd.type))return;const p=prop(pd.type,pd.name);if(!p)return;let v=p.value;
+  if(pd.type==='color')v=(((v>>>24)&255).toString(16).padStart(2,'0')+hex6(v).slice(1));else if(pd.type==='number'||pd.type==='integer')v=Math.round(v*1000)/1000;else if(rm&&pd.name==='scheme'&&rmPrev)v=rmPrev;
   q.set('v.'+pd.name,String(v))});
  return location.origin+location.pathname+'?'+q.toString()+'#tester'}
 $('b-share').onclick=async()=>{const u=shareURL(),b=$('b-share');try{history.replaceState(null,'',u)}catch(e){}
@@ -1899,7 +1913,7 @@ $('b-share').onclick=async()=>{const u=shareURL(),b=$('b-share');try{history.rep
  log('sys','สร้างลิงก์สถานะนี้');setTimeout(()=>b.lastChild.textContent='คัดลอกลิงก์',2200)};
 function applyPending(){if(!PENDING||!PENDING.started)return;const P=PENDING;PENDING=null;let n=0;
  if(vmi){const fl=flat();Object.entries(P.vals).forEach(([name,v])=>{const pd=fl.find(x=>x.name===name);if(!pd)return;const p=prop(pd.type,name);if(!p)return;
-  try{if(pd.type==='color'){const h=v.padStart(6,'0');p.rgb(parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16))}
+  try{if(pd.type==='color'){const h=v.length>6?v.padStart(8,'0'):'ff'+v.padStart(6,'0');p.argb(parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16),parseInt(h.slice(6,8),16))}
    else if(pd.type==='number'||pd.type==='integer')p.value=+v;else if(pd.type==='boolean')p.value=v==='true';
    else if(pd.type==='enumType'){if(!p.values.includes(v))return;p.value=v}else p.value=v;
    lastSet[name]={v:'',t:performance.now()};n++}catch(e){}})}
