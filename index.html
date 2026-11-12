@@ -122,6 +122,9 @@ canvas#rive{display:block;width:200px;height:200px;cursor:pointer;touch-action:n
 .fst[data-s="ok"]>b{background:#1F9D55}
 .fst[data-s="err"]{background:color-mix(in srgb,#D93636 10%,var(--sunk));color:#B42318}
 .fst[data-s="err"]>b{background:#D93636}
+.fst[data-s="warn"]{background:color-mix(in srgb,#E8A100 14%,var(--sunk))}
+.fst[data-s="warn"]>b{background:#C98500}
+.fst[data-s="warn"] small{white-space:normal;color:var(--ink);opacity:.85}
 .fst[data-s="err"] small{color:inherit;opacity:.8}
 .fdot{width:8px;height:8px;border-radius:50%;background:var(--muted);opacity:.5;flex:none}
 .fspin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:fspin .8s linear infinite;flex:none}
@@ -739,7 +742,6 @@ td code{white-space:nowrap}
           <span class="pl c4">ความเร็ว</span><div class="pc c5"><div class="segj" id="seg-speed" role="group" aria-label="ความเร็ว"><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="0.5">0.5×</button><button type="button" data-v="0.25">0.25×</button></div></div>
           <span class="pl">ขนาด</span><div class="pc"><div class="segj" id="seg-size" role="group" aria-label="ขนาด"><button type="button" data-v="24">24</button><button type="button" data-v="48">48</button><button type="button" data-v="96">96</button><button type="button" data-v="0" aria-pressed="true">เต็ม</button></div></div>
           <span class="pl c4">พื้นหลัง</span><div class="pc c5"><div class="segj" id="seg-bg" role="group" aria-label="พื้นหลัง preview"><button type="button" data-v="grid" aria-pressed="true"><i class="swd grid"></i>ตาราง</button><button type="button" data-v="light"><i class="swd light"></i>ขาว</button><button type="button" data-v="dark"><i class="swd dark"></i>เข้ม</button></div><span data-tip="<b>ความเร็ว</b> เล่นช้าลงเพื่อดู easing และ transition ระหว่าง state ไม่ได้แก้ค่าในไฟล์<br><br><b>ขนาด</b> แสดงที่ขนาดจริงเป็น px เส้นประคือขอบของ canvas ใช้ดูว่าเส้นบางหรือรายละเอียดเล็กยังอ่านออกไหม<br><br><b>พื้นหลัง</b> สีพื้นหลังของกล่อง preview ด้านบน ไม่ได้อยู่ในไฟล์ ใช้ “เข้ม” คู่กับ <code>surface: inverse</code> ดูว่าสีจมกับพื้นไหม<br><br><b>เริ่มใหม่</b> เปิดไฟล์ใหม่ ค่าที่ปรับไว้จะกลับเป็นค่าในไฟล์"></span></div>
-          <span class="pl">เรนเดอร์</span><div class="pc pspan"><div class="segj" id="seg-rend" role="group" aria-label="ตัวเรนเดอร์"><button type="button" data-v="webgl2">WebGL2 · เหมือน Editor</button><button type="button" data-v="canvas">Canvas</button></div><span data-tip="<b>WebGL2</b> วาดด้วย Rive Renderer ตัวเดียวกับใน Rive Editor เงาฟุ้ง (feather) และ effect จะออกมาเหมือนที่เห็นใน Editor Rive แนะนำให้ใช้ตัวนี้เป็นหลัก<br><br><b>Canvas</b> วาดด้วย Canvas 2D ของเบราว์เซอร์ ไฟล์เล็กกว่า แต่เงาฟุ้งอาจเป็นขั้นหรือแข็งกว่าใน Editor<br><br>ใช้สลับดูว่าไฟล์ออกมาต่างกันไหม แล้วบอก dev ให้ใช้ package ที่ตรงกัน: <code>@rive-app/webgl2</code> หรือ <code>@rive-app/canvas</code>"></span></div>
           <div class="pshare" id="share-row" hidden><span class="pl">ส่งสถานะนี้ให้ทีม: ไฟล์ ค่าที่ตั้ง และการแสดงผล</span><button class="ibtn" type="button" id="b-share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>คัดลอกลิงก์</button></div>
         </div>
         <div class="tpickers">
@@ -1652,6 +1654,9 @@ async function start(){const my=++gen;status('wait','กำลังเปิด
  if(cv.dataset.r&&cv.dataset.r!==RENDERER){const n=cv.cloneNode(false);cv.replaceWith(n);cv=n;bindWrap(cv)}cv.dataset.r=RENDERER;
  const opts={buffer:buf.slice(0),canvas:cv,autoplay:true,autoBind:true,
   layout:new rt.Layout({fit:rt.Fit.Contain,alignment:rt.Alignment.Center}),
+  /* WebGL2: draw through the shared offscreen Rive Renderer; the on-canvas path draws layout
+     background fills over their child text (text inside a filled layout disappears) */
+  ...(RENDERER==='webgl2'?{useOffscreenRenderer:true}:{}),
   assetLoader:(a,bytes)=>{if(my===gen)try{assets.push({name:a.name||a.uniqueFilename||'ไม่มีชื่อ',ext:a.fileExtension||'',kind:a.isFont?'font':a.isImage?'รูป':a.isAudio?'เสียง':'asset',embedded:!!(bytes&&bytes.length),cdn:!!a.cdnUuid})}catch(e){}return false},
   onLoad:()=>{if(my===gen)loaded(rt,my)},
   onLoadError:()=>{if(my===gen){status('bad','เปิดไฟล์ไม่ได้ ไฟล์อาจเสีย หรือ export จาก Rive Editor เวอร์ชันที่ใหม่กว่า runtime '+RIVE_VER);render(null)}}};
@@ -1678,6 +1683,26 @@ function loaded(rt,my){contents=R.contents||{artboards:[]};const abs=contents.ar
  R.on(rt.EventType.RiveEvent,e=>{const n=e.data&&e.data.name;if(!n)return;log('ev',n);if(!seen.has(n)){seen.add(n);renderChecks()}});
  status(null);fillPickers();render(rt);updPlay();$('share-row').hidden=FRAMED;applyStage();applyPending();
  log('sys',`artboard “${sel.ab}” · state machine “${sel.sm||'ไม่มี'}” · View model “${vmi?vmi.viewModelName:'ไม่ได้ผูก'}”${vmi?` · instance “${instLabel()}”`:''}`)}
+/* which characters of the file's text values does this font lack? read the font's cmap table
+   (TTF/OTF directly, WOFF by inflating that one table; WOFF2 is skipped) */
+async function fontCmap(u8){const dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength);const tag=o=>String.fromCharCode(u8[o],u8[o+1],u8[o+2],u8[o+3]);
+ let cm=null;const sig=tag(0);
+ if(sig==='wOF2')return null;
+ if(sig==='wOFF'){const n=dv.getUint16(12);for(let i=0;i<n;i++){const o=44+i*20;if(tag(o)!=='cmap')continue;const off=dv.getUint32(o+4),cl=dv.getUint32(o+8),ol=dv.getUint32(o+12);
+   let t=u8.subarray(off,off+cl);if(cl<ol){const ds=new DecompressionStream('deflate');t=new Uint8Array(await new Response(new Blob([t]).stream().pipeThrough(ds)).arrayBuffer())}cm=t}}
+ else{const n=dv.getUint16(4);for(let i=0;i<n;i++){const o=12+i*16;if(tag(o)==='cmap'){const off=dv.getUint32(o+8),len=dv.getUint32(o+12);cm=u8.subarray(off,off+len)}}}
+ if(!cm)return null;const c=new DataView(cm.buffer,cm.byteOffset,cm.byteLength);const has=new Set();const nt=c.getUint16(2);let best=null;
+ for(let i=0;i<nt;i++){const pid=c.getUint16(4+i*8),eid=c.getUint16(6+i*8),off=c.getUint32(8+i*8),fmt=c.getUint16(off);
+  if((pid===3&&(eid===10||eid===1))||pid===0){if(fmt===12)best={fmt,off};else if(fmt===4&&(!best||best.fmt!==12))best={fmt,off}}}
+ if(!best)return null;const o=best.off;
+ if(best.fmt===4){const sc=c.getUint16(o+6)/2,e=o+14,st=e+sc*2+2,de=st+sc*2,ro=de+sc*2;
+  return cp=>{for(let i=0;i<sc;i++){const end=c.getUint16(e+i*2);if(cp>end)continue;const start=c.getUint16(st+i*2);if(cp<start)return false;
+   const d=c.getInt16(de+i*2),r=c.getUint16(ro+i*2);if(!r)return((cp+d)&0xffff)!==0;const g=c.getUint16(ro+i*2+r+(cp-start)*2);return g!==0}return false}}
+ const ng=c.getUint32(o+12);return cp=>{for(let i=0;i<ng;i++){const g=o+16+i*12;if(cp>=c.getUint32(g)&&cp<=c.getUint32(g+4))return true}return false}}
+async function fontMissing(bytes){const has=await fontCmap(bytes);if(!has)return null;
+ let txt='';try{flat().forEach(pd=>{if(pd.type==='string'){const p=prop('string',pd.name);if(p&&p.value)txt+=p.value}})}catch(e){}
+ if(!txt.trim())txt='สวัสดี';
+ return [...new Set([...txt].filter(ch=>ch.trim()&&!has(ch.codePointAt(0))))]}
 /* ---------- View model instances ---------- */
 function instNames(){try{return VM?(VM.instanceNames||[]).filter(n=>n!==''):[]}catch(e){return[]}}
 function pickInst(k){if(!VM)return null;try{return VM.instanceByName(k)}catch(e){return null}}
@@ -1833,7 +1858,11 @@ function renderControls(){const box=$('controls');ctrlUpd={};box.innerHTML='';
      const a=await (isImg?RT.decodeImage(bytes):RT.decodeFont(bytes));if(!a)throw new Error('decode');
      try{p.value=a}catch(e){throw new Error('bind')}try{a.unref&&a.unref()}catch(e){}
      if(thumb)URL.revokeObjectURL(thumb);thumb=isImg?URL.createObjectURL(f):null;
-     show('ok',`${isImg?`<img src="${thumb}" alt="">`:`<b>✓</b>`}<span><b>${escH(f.name)}</b><small>${[dims,kb(f.size)].filter(Boolean).join(' · ')} · ส่งเข้าไฟล์แล้ว</small></span>`);
+     let miss=null;if(!isImg){try{miss=await fontMissing(bytes)}catch(e){miss=null}}
+     if(miss&&miss.length){const th=miss.some(c=>/[\u0E00-\u0E7F]/.test(c));
+      show('warn',`<b>!</b><span><b>${escH(f.name)}</b><small>ส่งเข้าไฟล์แล้ว แต่ font นี้ไม่มี${th?'ตัวอักษรไทย':'บางตัวอักษร'} (${escH(miss.slice(0,8).join(' '))}${miss.length>8?' …':''}) ข้อความส่วนนั้นจะขึ้นเป็นกล่อง ▯</small></span>`);
+      log('sys',`${pd.name}: ${f.name} ไม่มีตัวอักษร ${miss.join('')}`)}
+     else show('ok',`${isImg?`<img src="${thumb}" alt="">`:`<b>✓</b>`}<span><b>${escH(f.name)}</b><small>${[dims,kb(f.size)].filter(Boolean).join(' · ')} · ส่งเข้าไฟล์แล้ว${isImg?'':' · มีตัวอักษรครบตามข้อความในไฟล์'}</small></span>`);
      log('out',`${pd.name} = ${f.name}${dims?' ('+dims+')':''}`);
      if(isImg&&f.size>2*1024*1024)log('sys',`${pd.name}: รูปใหญ่ ${kb(f.size)} บนเว็บจริงควรย่อให้เล็กกว่า 2 MB`)}
     catch(e){const why=e.message==='broken'?'ไฟล์รูปเสียหรืออ่านไม่ได้':e.message==='bind'?'ใส่ค่าเข้า property นี้ไม่ได้':isImg?'Rive อ่านรูปนี้ไม่ได้':'Rive อ่าน font นี้ไม่ได้';
@@ -1916,6 +1945,7 @@ ${assets.some(a=>!a.embedded&&!a.cdn)?`  assetLoader: (asset, bytes) => {   ${c(
     ${c('// โหลดไฟล์ของ asset.name เอง แล้วเรียก asset.decode(new Uint8Array(buffer))')}
     ${k('return true')};
   },
+`:''}${RENDERER==='webgl2'?`  useOffscreenRenderer: ${k('true')},   ${c('// ต้องมี ไม่งั้นข้อความในกล่อง layout ที่มีสีพื้นจะหาย')}
 `:''}  autoBind: ${k(vmi&&sel.inst?'false':'true')},
   onLoad: () => {
     r.resizeDrawingSurfaceToCanvas();
@@ -1938,14 +1968,13 @@ $('b-copy').onclick=async()=>{const t=$('t-code').innerText,b=$('b-copy');
 /* ---------- preview toolbar ---------- */
 function segSet(id,v){$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===String(v)))}
 function applyStage(){const st=$('tstage');st.classList.toggle('sized',SIZE>0);st.style.setProperty('--cs',SIZE+'px');
- st.classList.remove('bg-light','bg-dark');if(BG!=='grid')st.classList.add('bg-'+BG);segSet('seg-size',SIZE);segSet('seg-bg',BG);segSet('seg-speed',SPEED);segSet('seg-rend',RENDERER);
+ st.classList.remove('bg-light','bg-dark');if(BG!=='grid')st.classList.add('bg-'+BG);segSet('seg-size',SIZE);segSet('seg-bg',BG);segSet('seg-speed',SPEED);
  if(R)requestAnimationFrame(()=>{try{R.resizeDrawingSurfaceToCanvas()}catch(e){}})}
 const segPick=(id,fn)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(b){fn(b.dataset.v);applyStage()}});
 segPick('seg-speed',v=>{SPEED=+v;log('sys',`ความเร็ว ${v}×`)});
 segPick('seg-size',v=>{SIZE=+v;log('sys',SIZE?`ขนาด ${SIZE}px`:'ขนาดเต็มกล่อง')});
 segPick('seg-bg',v=>{BG=v});
-segPick('seg-rend',v=>{if(v===RENDERER||(v==='webgl2'&&!HAS_GL2))return;RENDERER=v;log('sys',`เรนเดอร์ด้วย ${v==='webgl2'?'WebGL2 (Rive Renderer)':'Canvas 2D'}`);if(buf)start();else loadRuntime().catch(()=>{})});
-if(!HAS_GL2){const b=document.querySelector('#seg-rend [data-v="webgl2"]');b.disabled=true;b.title='เบราว์เซอร์นี้ไม่รองรับ WebGL2'}
+if(!HAS_GL2)setTimeout(()=>{try{log('sys','เบราว์เซอร์นี้ไม่รองรับ WebGL2 จึงเรนเดอร์ด้วย Canvas 2D แทน')}catch(e){}},0);
 function updPlay(){const b=$('b-play'),ok=!!(R&&contents);b.disabled=!ok;$('b-restart').disabled=!buf;const paused=ok&&!R.isPlaying;b.innerHTML=paused?'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>เล่นต่อ':'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>หยุด'}
 $('b-play').onclick=()=>{if(!R)return;try{if(R.isPlaying){R.pause();log('sys','หยุด')}else{R.play();log('sys','เล่นต่อ')}}catch(e){}updPlay()};
 $('b-restart').onclick=()=>{if(buf){log('sys','เริ่มใหม่');start()}};
@@ -1971,7 +2000,7 @@ function addAssets(add){if(!assets.length)return;
 
 /* ---------- share link ---------- */
 function shareURL(){const q=new URLSearchParams();q.set('f',fromSample||fname);if(sel.ab)q.set('ab',sel.ab);if(sel.sm)q.set('sm',sel.sm);if(sel.inst)q.set('inst',sel.inst);
- if(SPEED!==1)q.set('speed',SPEED);if(SIZE)q.set('size',SIZE);if(BG!=='grid')q.set('bg',BG);if(RENDERER!=='webgl2')q.set('r',RENDERER);const rm=$('cb-rm').checked&&!!rmProp();if(rm)q.set('rm','1');
+ if(SPEED!==1)q.set('speed',SPEED);if(SIZE)q.set('size',SIZE);if(BG!=='grid')q.set('bg',BG);const rm=$('cb-rm').checked&&!!rmProp();if(rm)q.set('rm','1');
  if(vmi)flat().forEach(pd=>{if(!['enumType','number','integer','boolean','color','string'].includes(pd.type))return;const p=prop(pd.type,pd.name);if(!p)return;let v=p.value;
   if(pd.type==='color')v=(((v>>>24)&255).toString(16).padStart(2,'0')+hex6(v).slice(1));else if(pd.type==='number'||pd.type==='integer')v=Math.round(v*1000)/1000;else if(rm&&pd.name==='scheme'&&rmPrev)v=rmPrev;
   q.set('v.'+pd.name,String(v))});
@@ -1991,7 +2020,7 @@ function applyPending(){if(!PENDING||!PENDING.started)return;const P=PENDING;PEN
  PENDING={file:q.get('f'),ab:q.get('ab'),sm:q.get('sm'),inst:q.get('inst'),rm:q.get('rm')==='1',vals:{}};
  q.forEach((v,k)=>{if(k.startsWith('v.'))PENDING.vals[k.slice(2)]=v});
  if(q.has('speed'))SPEED=[1,0.5,0.25].includes(+q.get('speed'))?+q.get('speed'):1;if(q.has('size'))SIZE=[0,24,48,96].includes(+q.get('size'))?+q.get('size'):0;
- if(['grid','light','dark'].includes(q.get('bg')))BG=q.get('bg');if(q.get('r')==='canvas')RENDERER='canvas';applyStage();if(PENDING.rm)$('cb-rm').checked=true;
+ if(['grid','light','dark'].includes(q.get('bg')))BG=q.get('bg');applyStage();if(PENDING.rm)$('cb-rm').checked=true;
  $('t-test').click();loadRuntime().catch(()=>{});
  if(SAMPLES[PENDING.file])openSample(PENDING.file);
  else{$('drop-title').textContent=`ลากไฟล์ ${PENDING.file} มาวางที่นี่`;$('drop-sub').textContent='ลิงก์นี้ตั้งค่าไว้สำหรับไฟล์นี้ เปิดไฟล์แล้วค่าจะตั้งให้ตามลิงก์'}})();
